@@ -39,12 +39,12 @@ class Manager(User):
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
-    item1 = models.CharField(max_length=255)
-    item1_points = models.IntegerField()
-    item2 = models.CharField(max_length=255)
-    item2_points = models.IntegerField()
-    item3 = models.CharField(max_length=255)
-    item3_points = models.IntegerField()
+    item1 = models.CharField(max_length=255, blank=True)
+    item1_points = models.IntegerField(null=True)
+    item2 = models.CharField(max_length=255, blank=True)
+    item2_points = models.IntegerField(null=True)
+    item3 = models.CharField(max_length=255, blank=True)
+    item3_points = models.IntegerField(null=True)
     manager = models.OneToOneField(Manager, on_delete=models.CASCADE, related_name='restaurant')
 
     def __str__(self):

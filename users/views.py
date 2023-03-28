@@ -33,7 +33,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
 class RestaurantSerializer(ModelSerializer):
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'address']
+        fields = ['id', 'name', 'address', 'item1', 'item1_points', 'item2', 'item2_points', 'item3', 'item3_points']
 
 class ManagerSerializer(ModelSerializer):
     token = SerializerMethodField()
