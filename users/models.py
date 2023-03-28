@@ -1,7 +1,14 @@
+import random
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
+
+from uuid import uuid4
+
+def random_code():
+    return "".join([str(random.randint(0, 9)) for _ in range(6)])
 
 class User(AbstractUser):
     class Role(models.TextChoices):
@@ -57,3 +64,13 @@ class CustomerPoints(models.Model):
 
     def __str__(self):
         return f"{self.customer.username} at {self.restaurant.name} ({self.num_points} points)"
+    
+class PhoneAuthentication(models.Model):
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message=_("Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    )
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, unique=True)
+    code = models.CharField(max_length=6, default=random_code)
+    is_verified = models.BooleanField(default=False)
+    proxy_uuid = models.UUIDField(default=uuid4)

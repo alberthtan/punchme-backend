@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, CustomerPointsViewSet
+from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, CustomerPointsViewSet, PhoneAuthentication
 
 from rest_framework.routers import DefaultRouter
 
