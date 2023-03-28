@@ -1,10 +1,11 @@
 # users/views.py
 from rest_framework import generics, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.serializers import EmailField, CharField, ModelSerializer, Serializer, SerializerMethodField
-from users.models import Customer, Manager
+from users.models import Customer, Manager, Restaurant
 
 
 class CustomerSerializer(ModelSerializer):
@@ -29,8 +30,20 @@ class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
 
+class RestaurantSerializer(ModelSerializer):
+    class Meta:
+        model = Restaurant
+        fields = ['id', 'name', 'address']
+
 class ManagerSerializer(ModelSerializer):
     token = SerializerMethodField()
+    restaurant = RestaurantSerializer(required=True)
+
+    def create(self, validated_data):
+        restaurant_data = validated_data.pop('restaurant')
+        manager = Manager.objects.create_user(**validated_data)
+        Restaurant.objects.create(manager=manager, **restaurant_data)
+        return manager
     
     def get_token(self, user):
         refresh = RefreshToken.for_user(user)
@@ -51,3 +64,16 @@ class ManagerViewSet(viewsets.ModelViewSet):
     """
     queryset = Manager.objects.all()
     serializer_class = ManagerSerializer
+
+class ManagerRestaurantView(APIView):
+    def post(self, request):
+        manager_serializer = ManagerSerializer(data=request.data)
+        restaurant_serializer = RestaurantSerializer(data=request.data.get('restaurant'))
+
+        if manager_serializer.is_valid(raise_exception=True) and restaurant_serializer.is_valid(raise_exception=True):
+            manager = manager_serializer.save()
+            restaurant_serializer.save(manager=manager)
+
+            return Response({"success": "Manager and Restaurant created successfully"}, status=status.HTTP_201_CREATED)
+
+        return Response({"error": "Manager and Restaurant creation failed"}, status=status.HTTP_400_BAD_REQUEST)
