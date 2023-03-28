@@ -17,6 +17,7 @@ django-heroku = "*"
 djangorestframework-simplejwt="*"
 django-storages="*"
 django-cors-headers = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

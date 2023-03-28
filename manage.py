@@ -2,8 +2,8 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-if os.environ.get('ENVIRONMENT') != 'production':
-    from dotenv import load_dotenv
+# if os.environ.get('ENVIRONMENT') != 'production':
+#     from dotenv import load_dotenv
 
 
 def main():
@@ -11,8 +11,8 @@ def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'punchme.settings')
     # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     # environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
-    if os.environ.get('ENVIRONMENT') != 'production':
-        load_dotenv()
+    # if os.environ.get('ENVIRONMENT') != 'production':
+    #     load_dotenv()
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
