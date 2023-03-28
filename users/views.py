@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.serializers import EmailField, CharField, ModelSerializer, Serializer, SerializerMethodField
-from users.models import Customer, Manager, Restaurant
+from users.models import Customer, Manager, Restaurant, CustomerPoints
 
 
 class CustomerSerializer(ModelSerializer):
@@ -24,9 +24,6 @@ class CustomerSerializer(ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'email', 'username', 'token', 'phone_number']
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    """
-    A viewset for viewing and editing user instances.
-    """
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
 
@@ -36,9 +33,6 @@ class RestaurantSerializer(ModelSerializer):
         fields = ['id', 'name', 'address', 'item1', 'item1_points', 'item2', 'item2_points', 'item3', 'item3_points']
 
 class RestaurantViewSet(viewsets.ModelViewSet):
-    """
-    View for creating a new manager
-    """
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
 
@@ -66,9 +60,6 @@ class ManagerSerializer(ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
 class ManagerViewSet(viewsets.ModelViewSet):
-    """
-    View for creating a new manager
-    """
     queryset = Manager.objects.all()
     serializer_class = ManagerSerializer
 
@@ -84,3 +75,12 @@ class ManagerRestaurantView(APIView):
             return Response({"success": "Manager and Restaurant created successfully"}, status=status.HTTP_201_CREATED)
 
         return Response({"error": "Manager and Restaurant creation failed"}, status=status.HTTP_400_BAD_REQUEST)
+    
+class CustomerPointsSerializer(ModelSerializer):
+    class Meta:
+        model = CustomerPoints
+        fields = ['id', 'customer', 'restaurant', 'num_points']
+
+class CustomerPointsViewSet(viewsets.ModelViewSet):
+    queryset = CustomerPoints.objects.all()
+    serializer_class = CustomerPointsSerializer

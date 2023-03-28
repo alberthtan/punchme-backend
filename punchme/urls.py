@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet
+from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, CustomerPointsViewSet
 
 from rest_framework.routers import DefaultRouter
 
@@ -25,6 +25,7 @@ router = DefaultRouter()
 router.register(r'customers', CustomerViewSet, basename='customer')
 router.register(r'managers', ManagerViewSet, basename='manager')
 router.register(r'restaurants', RestaurantViewSet, basename='restaurant')
+router.register(r'customer-points', CustomerPointsViewSet, basename='customerpoints')
 
 
 urlpatterns = [

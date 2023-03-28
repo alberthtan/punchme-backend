@@ -49,3 +49,11 @@ class Restaurant(models.Model):
 
     def __str__(self):
         return self.name
+    
+class CustomerPoints(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    num_points = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.customer.username} at {self.restaurant.name} ({self.num_points} points)"
