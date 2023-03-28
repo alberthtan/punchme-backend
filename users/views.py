@@ -35,6 +35,13 @@ class RestaurantSerializer(ModelSerializer):
         model = Restaurant
         fields = ['id', 'name', 'address', 'item1', 'item1_points', 'item2', 'item2_points', 'item3', 'item3_points']
 
+class RestaurantViewSet(viewsets.ModelViewSet):
+    """
+    View for creating a new manager
+    """
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
+
 class ManagerSerializer(ModelSerializer):
     token = SerializerMethodField()
     restaurant = RestaurantSerializer(required=True)
