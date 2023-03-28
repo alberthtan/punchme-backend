@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, CustomerPointsViewSet, PhoneAuthentication
+from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, CustomerPointsViewSet
+from users.views import SendPhoneCode, VerifyPhoneCode
 
 from rest_framework.routers import DefaultRouter
 
@@ -30,6 +31,8 @@ router.register(r'customer-points', CustomerPointsViewSet, basename='customerpoi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('send-phone-code/', SendPhoneCode.as_view()),
+    path('verify-phone-code/', VerifyPhoneCode.as_view()),
 ]
 
 urlpatterns += router.urls
