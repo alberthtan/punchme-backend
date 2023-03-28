@@ -1,2 +1,2 @@
 release: python3 manage.py migrate
-web: gunicorn backend.wsgi
+web: gunicorn punchme.wsgi
