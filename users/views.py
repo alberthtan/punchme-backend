@@ -24,7 +24,7 @@ class ManagerSerializer(ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'email', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
-class ManagerCreateView(viewsets.ModelViewSet):
+class ManagerViewSet(viewsets.ModelViewSet):
     """
     View for creating a new manager
     """
