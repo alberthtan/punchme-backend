@@ -55,7 +55,7 @@ class ManagerSerializer(ModelSerializer):
 
     class Meta:
         model = Manager
-        fields = ['id', 'first_name', 'last_name', 'manager_email', 'username', 'token', 'password']
+        fields = ['id', 'first_name', 'last_name', 'manager_email', 'username', 'token', 'password', 'restaurant']
         extra_kwargs = {'password': {'write_only': True}}
 
 class ManagerViewSet(viewsets.ModelViewSet):
