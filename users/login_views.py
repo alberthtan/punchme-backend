@@ -25,6 +25,7 @@ class SendPhoneCode(CreateAPIView):
     serializer_class = SendPhoneCodeSerializer
 
     def create(self, request, *args, **kwargs):
+        print("here1")
         code_request = SendPhoneCodeSerializer(data=request.data)
         code_request.is_valid(raise_exception=True)
 
