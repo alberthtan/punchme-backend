@@ -17,7 +17,5 @@ def get_customer(request):
         return Response("Invalid Credentials", status=403)
     
     user_serializer = CustomerSerializer(request.user)
-    if not user_serializer.is_valid():
-        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(user_serializer.data)
