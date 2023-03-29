@@ -16,6 +16,8 @@ def get_customer(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
     
-    user_serializer = CustomerSerializer(request.user)
+    print(request.user)
+    customer = Customer.objects.get(username=request.user)
+    user_serializer = CustomerSerializer(customer)
 
     return Response(user_serializer.data)
