@@ -1,12 +1,12 @@
 # users/views.py
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
-from rest_framework.serializers import EmailField, CharField, ModelSerializer, Serializer, SerializerMethodField
-from users.models import Customer, Manager, Restaurant, CustomerPoints, PhoneAuthentication
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from users.models import Customer, Manager, Restaurant, CustomerPoints
+from users.permissions import StaffPermissions
 
 from twilio_config import twilio_client, twilio_phone_number
 
@@ -29,6 +29,7 @@ class CustomerSerializer(ModelSerializer):
 class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
+    permission_classes = [StaffPermissions]
 
 class RestaurantSerializer(ModelSerializer):
     class Meta:
@@ -38,6 +39,7 @@ class RestaurantSerializer(ModelSerializer):
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
+    permission_classes = [StaffPermissions]
 
 class ManagerSerializer(ModelSerializer):
     token = SerializerMethodField()
@@ -64,6 +66,7 @@ class ManagerSerializer(ModelSerializer):
 class ManagerViewSet(viewsets.ModelViewSet):
     queryset = Manager.objects.all()
     serializer_class = ManagerSerializer
+    permission_classes = [StaffPermissions]
 
 class ManagerRestaurantView(APIView):
     def post(self, request):
@@ -86,3 +89,4 @@ class CustomerPointsSerializer(ModelSerializer):
 class CustomerPointsViewSet(viewsets.ModelViewSet):
     queryset = CustomerPoints.objects.all()
     serializer_class = CustomerPointsSerializer
+    permission_classes = [StaffPermissions]

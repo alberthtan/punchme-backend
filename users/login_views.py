@@ -9,6 +9,7 @@ from rest_framework import viewsets
 from rest_framework.serializers import EmailField, CharField, ModelSerializer, BooleanField, SerializerMethodField
 from users.models import Customer, Manager, PhoneAuthentication, EmailAuthentication
 from users.views import CustomerSerializer, ManagerSerializer
+
 from django.utils.translation import gettext_lazy as _
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
@@ -65,10 +66,7 @@ class RegisterVerifyPhoneCodeSerializer(ModelSerializer):
         fields = (
           'phone_number',
           'code',
-          'email',
           'proxy_uuid',
-          'first_name',
-          'last_name',
         )
 
 class RegisterVerifyPhoneCode(UpdateAPIView):
@@ -98,16 +96,10 @@ class RegisterVerifyPhoneCode(UpdateAPIView):
         PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
 
         # REGISTRATION
-        first_name = verify_request.data.get("first_name")
-        last_name = verify_request.data.get("last_name")
-        email = verify_request.data.get("email")
         phone_number = verify_request.data.get("phone_number")
 
         try:
             user = Customer.objects.create_user(
-                first_name=first_name, 
-                last_name=last_name, 
-                email=email, 
                 username=phone_number, 
                 phone_number=phone_number
             )
