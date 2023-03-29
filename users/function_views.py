@@ -50,7 +50,7 @@ def update_customer(request):
 
     # Serialize the updated customer instance and return the response
     serializer = CustomerSerializer(instance)
-    return Response(serializer.data)
+    return Response(serializer.data, status=200)
 
 
 @api_view(['GET'])
@@ -92,5 +92,5 @@ def update_manager(request):
     instance = Manager.objects.get(id=manager.id)
 
     # Serialize the updated manager instance and return the response
-    serializer = ManagerSerializer(manager)
-    return Response(serializer.data)
+    serializer = ManagerSerializer(instance)
+    return Response(serializer.data, status=200)
