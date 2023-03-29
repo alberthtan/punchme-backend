@@ -269,7 +269,7 @@ class RegisterVerifyEmailCode(UpdateAPIView):
             user = Manager.objects.create_user(
                 first_name=first_name, 
                 last_name=last_name, 
-                email=email, 
+                manager_email=email, 
                 username=email, 
             )
         except IntegrityError:
