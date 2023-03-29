@@ -62,6 +62,7 @@ class RegisterVerifyPhoneCodeSerializer(ModelSerializer):
           'phone_number',
           'code',
           'email',
+          'proxy_uuid',
           'first_name',
           'last_name',
         )
