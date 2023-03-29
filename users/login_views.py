@@ -9,8 +9,8 @@ from rest_framework.serializers import EmailField, CharField, ModelSerializer, B
 from users.models import Customer, Manager, Restaurant, CustomerPoints, PhoneAuthentication
 from users.views import CustomerSerializer
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import RegexValidator
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 
 from twilio_config import twilio_client, twilio_phone_number
 
@@ -52,7 +52,6 @@ class RegisterVerifyPhoneCodeSerializer(ModelSerializer):
     first_name = CharField()
     last_name = CharField()
     email = EmailField()
-    phone_number = CharField()
 
     class Meta:
         model = PhoneAuthentication
@@ -118,4 +117,58 @@ class RegisterVerifyPhoneCode(UpdateAPIView):
                 'user': user_serializer.data,
             },
             status=status.HTTP_201_CREATED,
+        )
+    
+
+class LoginVerifyPhoneCodeSerializer(ModelSerializer):
+    class Meta:
+        model = PhoneAuthentication
+        fields = (
+          'phone_number',
+          'code',
+        )
+
+class LoginVerifyPhoneCode(UpdateAPIView):
+    serializer_class = RegisterVerifyPhoneCodeSerializer
+
+    def update(self, request, *args, **kwargs):
+        verify_request = RegisterVerifyPhoneCodeSerializer(data=request.data)
+        verify_request.is_valid(raise_exception=True)
+
+        phone_number = verify_request.data.get('phone_number')
+        code = verify_request.data.get('code')
+        
+        phone_auths = PhoneAuthentication.objects.filter(
+            phone_number=phone_number,
+            code=code,
+        )
+        
+        if not phone_auths.exists():
+            return Response(
+                {
+                    'code': ['code does not match'],
+                },
+                status.HTTP_400_BAD_REQUEST,                
+            )
+        
+        phone_auths.update(is_verified=True)
+
+        # LOGIN
+        try:
+            customer = Customer.objects.get(phone_number=phone_number)
+        except ObjectDoesNotExist:
+            return Response(
+                {
+                    'message': 'No matching user found',
+                },
+                status.HTTP_400_BAD_REQUEST,
+            )
+
+        customer_serializer = CustomerSerializer(customer)
+        return Response(
+            {
+                'message': 'Login successful',
+                'user': customer_serializer.data,
+            },
+            status.HTTP_200_OK,
         )
