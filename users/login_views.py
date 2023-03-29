@@ -41,6 +41,9 @@ class SendPhoneCode(CreateAPIView):
         )
         print(PhoneAuthentication.objects.all())
         print(PhoneAuthentication.objects.filter(phone_number=phone_number))
+        PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
+        print(PhoneAuthentication.objects.all())
+        print(PhoneAuthentication.objects.filter(phone_number=phone_number))
         
         twilio_client.messages.create(
             body=f"Your code for Punchme is {phone_auth.code}",
