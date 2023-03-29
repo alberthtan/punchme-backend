@@ -24,6 +24,34 @@ def get_customer(request):
     user_serializer = CustomerSerializer(customer)
     return Response(user_serializer.data, status=200)
 
+@api_view(['PATCH'])
+@csrf_exempt
+def update_customer(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    customer = request.user
+    serializer = CustomerSerializer(customer, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Extract the validated data from the serializer
+    validated_data = serializer.validated_data
+
+    # Update the customer instance with the validated data
+    for attr, value in validated_data.items():
+        setattr(customer, attr, value)
+
+    # Save the customer instance
+    customer.save()
+
+    # Retrieve the updated customer instance from the database
+    instance = Customer.objects.get(id=customer.id)
+
+    # Serialize the updated customer instance and return the response
+    serializer = CustomerSerializer(instance)
+    return Response(serializer.data)
+
 
 @api_view(['GET'])
 @csrf_exempt
