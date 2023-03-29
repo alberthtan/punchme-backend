@@ -30,6 +30,7 @@ class SendPhoneCode(CreateAPIView):
 
         phone_number = code_request.data.get('phone_number')
         
+        print(PhoneAuthentication.objects.filter(phone_number=phone_number))
         PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
         
         phone_auth = PhoneAuthentication.objects.create(
@@ -87,6 +88,7 @@ class RegisterVerifyPhoneCode(UpdateAPIView):
             )
         
         phone_auths.update(is_verified=True)
+        PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
 
         # REGISTRATION
         first_name = verify_request.data.get("first_name")
@@ -129,10 +131,10 @@ class LoginVerifyPhoneCodeSerializer(ModelSerializer):
         )
 
 class LoginVerifyPhoneCode(UpdateAPIView):
-    serializer_class = RegisterVerifyPhoneCodeSerializer
+    serializer_class = LoginVerifyPhoneCodeSerializer
 
     def update(self, request, *args, **kwargs):
-        verify_request = RegisterVerifyPhoneCodeSerializer(data=request.data)
+        verify_request = LoginVerifyPhoneCodeSerializer(data=request.data)
         verify_request.is_valid(raise_exception=True)
 
         phone_number = verify_request.data.get('phone_number')
@@ -152,6 +154,7 @@ class LoginVerifyPhoneCode(UpdateAPIView):
             )
         
         phone_auths.update(is_verified=True)
+        PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
 
         # LOGIN
         try:
