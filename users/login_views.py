@@ -57,9 +57,6 @@ class SendPhoneCode(CreateAPIView):
 
 
 class RegisterVerifyPhoneCodeSerializer(ModelSerializer):
-    first_name = CharField()
-    last_name = CharField()
-    email = EmailField()
 
     class Meta:
         model = PhoneAuthentication
@@ -102,9 +99,6 @@ class RegisterVerifyPhoneCode(UpdateAPIView):
             user = Customer.objects.create_user(
                 username=phone_number, 
                 phone_number=phone_number,
-                first_name=None,
-                last_name=None,
-                email=None,
             )
         except IntegrityError:
             return Response(
