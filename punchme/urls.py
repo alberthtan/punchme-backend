@@ -19,7 +19,7 @@ from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, Cust
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer
-from users.function_views import get_manager
+from users.function_views import get_manager, update_manager
 
 
 from rest_framework.routers import DefaultRouter
@@ -46,6 +46,7 @@ urlpatterns = [
     path('update-customer/', update_customer),
 
     path('get-manager', get_manager),
+    path('update-manager/', update_manager),
 ]
 
 urlpatterns += router.urls

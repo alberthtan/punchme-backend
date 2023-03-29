@@ -66,3 +66,31 @@ def get_manager(request):
     
     user_serializer = ManagerSerializer(manager)
     return Response(user_serializer.data)
+
+@api_view(['PATCH'])
+@csrf_exempt
+def update_manager(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    manager = request.user
+    serializer = ManagerSerializer(manager, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Extract the validated data from the serializer
+    validated_data = serializer.validated_data
+
+    # Update the manager instance with the validated data
+    for attr, value in validated_data.items():
+        setattr(manager, attr, value)
+
+    # Save the manager instance
+    manager.save()
+
+    # Retrieve the updated manager instance from the database
+    instance = Manager.objects.get(id=manager.id)
+
+    # Serialize the updated manager instance and return the response
+    serializer = ManagerSerializer(manager)
+    return Response(serializer.data)
