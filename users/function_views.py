@@ -52,6 +52,15 @@ def update_customer(request):
     serializer = CustomerSerializer(instance)
     return Response(serializer.data, status=200)
 
+@api_view(['DELETE'])
+@csrf_exempt
+def delete_customer(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+    
+    customer = request.user
+    customer.delete()
+    return Response("Customer deleted successfully.", status=200)
 
 @api_view(['GET'])
 @csrf_exempt
@@ -94,3 +103,13 @@ def update_manager(request):
     # Serialize the updated manager instance and return the response
     serializer = ManagerSerializer(instance)
     return Response(serializer.data, status=200)
+
+@api_view(['DELETE'])
+@csrf_exempt
+def delete_manager(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+    
+    manager = request.user
+    manager.delete()
+    return Response("Manager deleted successfully.", status=200)
