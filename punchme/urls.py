@@ -18,7 +18,7 @@ from django.urls import path
 from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, CustomerPointsViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
-from users.function_views import get_customer
+from users.function_views import get_customer, get_manager
 
 from rest_framework.routers import DefaultRouter
 
@@ -41,6 +41,7 @@ urlpatterns = [
     path('login-verify-email-code/', LoginVerifyEmailCode.as_view()),
 
     path('get-customer', get_customer),
+    path('get-manager', get_manager),
 ]
 
 urlpatterns += router.urls
