@@ -16,14 +16,19 @@ class User(AbstractUser):
         CUSTOMER = "CUSTOMER", 'Customer'
         MANAGER = "MANAGER", 'Manager'
 
-    base_role = Role.CUSTOMER
     role = models.CharField(max_length=50, choices=Role.choices, null=True)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
+    email = models.EmailField(blank=True)
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.role = self.base_role
-            return super().save(*args, **kwargs)
+        if not self.pk and not self.role:
+            self.role = self.get_base_role()
+        return super().save(*args, **kwargs)
         
+    def get_base_role(self):
+        return self.__class__.Role.CUSTOMER if issubclass(self.__class__, Customer) else self.__class__.Role.MANAGER
+
 class Customer(User): 
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
@@ -31,6 +36,10 @@ class Customer(User):
     )
     phone_number = models.CharField(validators=[phone_regex], max_length=17, unique=True)
     USERNAME_FIELD = 'phone_number'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.role = self.get_base_role()
 
     def save(self, *args, **kwargs):
         self.username = self.phone_number
