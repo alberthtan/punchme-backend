@@ -288,3 +288,57 @@ class RegisterVerifyEmailCode(UpdateAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+    
+class LoginVerifyEmailCodeSerializer(ModelSerializer):
+    class Meta:
+        model = EmailAuthentication
+        fields = (
+          'phone_number',
+          'code',
+        )
+
+class LoginVerifyEmailCode(UpdateAPIView):
+    serializer_class = LoginVerifyPhoneCodeSerializer
+
+    def update(self, request, *args, **kwargs):
+        verify_request = self.serializer_class(data=request.data)
+        verify_request.is_valid(raise_exception=True)
+
+        email = verify_request.data.get('email')
+        code = verify_request.data.get('code')
+        
+        email_auths = EmailAuthentication.objects.filter(
+            email=email,
+            code=code,
+        )
+        
+        if not email_auths.exists():
+            return Response(
+                {
+                    'code': ['code does not match'],
+                },
+                status.HTTP_400_BAD_REQUEST,                
+            )
+        
+        email_auths.update(is_verified=True)
+        EmailAuthentication.objects.filter(email=email).delete()
+
+        # LOGIN
+        try:
+            manager = Manager.objects.get(manager_email=email)
+        except ObjectDoesNotExist:
+            return Response(
+                {
+                    'message': 'No matching user found',
+                },
+                status.HTTP_400_BAD_REQUEST,
+            )
+
+        manager_serializer = ManagerSerializer(manager)
+        return Response(
+            {
+                'message': 'Login successful',
+                'user': manager_serializer.data,
+            },
+            status.HTTP_200_OK,
+        )
