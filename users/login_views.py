@@ -52,11 +52,7 @@ class RegisterVerifyPhoneCodeSerializer(ModelSerializer):
     first_name = CharField()
     last_name = CharField()
     email = EmailField()
-    phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message=_("Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    )
-    phone_number = CharField(validators=[phone_regex], max_length=17, unique=True)
+    phone_number = CharField()
 
     class Meta:
         model = PhoneAuthentication
