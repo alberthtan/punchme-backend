@@ -266,7 +266,7 @@ class RegisterVerifyEmailCode(UpdateAPIView):
         email = verify_request.data.get("email")
 
         try:
-            user = Customer.objects.create_user(
+            user = Manager.objects.create_user(
                 first_name=first_name, 
                 last_name=last_name, 
                 email=email, 
