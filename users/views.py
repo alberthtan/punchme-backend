@@ -34,7 +34,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
 class RestaurantSerializer(ModelSerializer):
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'address', 'item1', 'item1_points', 'item2', 'item2_points', 'item3', 'item3_points']
+        fields = '__all__'
 
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.all()
@@ -84,7 +84,7 @@ class ManagerRestaurantView(APIView):
 class CustomerPointsSerializer(ModelSerializer):
     class Meta:
         model = CustomerPoints
-        fields = ['id', 'customer', 'restaurant', 'num_points']
+        fields = '__all__'
 
 class CustomerPointsViewSet(viewsets.ModelViewSet):
     queryset = CustomerPoints.objects.all()

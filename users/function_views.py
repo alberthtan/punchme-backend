@@ -92,7 +92,11 @@ def update_manager(request):
 
     # Update the manager instance with the validated data
     for attr, value in validated_data.items():
-        setattr(manager, attr, value)
+        if attr == "restaurant":
+            for restaurant_attr, restaurant_value in value.items():
+                setattr(manager.restaurant, restaurant_attr, restaurant_value)
+        else:
+            setattr(manager, attr, value)
 
     # Save the manager instance
     manager.save()
