@@ -25,18 +25,18 @@ class SendPhoneCode(CreateAPIView):
     serializer_class = SendPhoneCodeSerializer
 
     def create(self, request, *args, **kwargs):
-        print("here1")
-        code_request = SendPhoneCodeSerializer(data=request.data)
-        code_request.is_valid(raise_exception=True)
-
-        phone_number = code_request.data.get('phone_number')
-        
         print("here")
         print(phone_number)
         print(PhoneAuthentication.objects.all())
         PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
         print(PhoneAuthentication.objects.all())
         print("creating")
+        code_request = SendPhoneCodeSerializer(data=request.data)
+        code_request.is_valid(raise_exception=True)
+
+        phone_number = code_request.data.get('phone_number')
+        
+        
         
         phone_auth = PhoneAuthentication.objects.create(
             phone_number=phone_number,
