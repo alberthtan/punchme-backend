@@ -298,7 +298,7 @@ class LoginVerifyEmailCodeSerializer(ModelSerializer):
         )
 
 class LoginVerifyEmailCode(UpdateAPIView):
-    serializer_class = LoginVerifyPhoneCodeSerializer
+    serializer_class = LoginVerifyEmailCodeSerializer
 
     def update(self, request, *args, **kwargs):
         verify_request = self.serializer_class(data=request.data)
