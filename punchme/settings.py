@@ -134,7 +134,14 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True
 }
 
-# Defaul
+# Email details
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = f'dutch pay <{os.environ.get("EMAIL_HOST_USER")}>'
 
 AUTH_USER_MODEL = 'users.User'
 
