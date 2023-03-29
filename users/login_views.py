@@ -13,6 +13,7 @@ from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
 from twilio_config import twilio_client, twilio_phone_number
+from twilio.base.exceptions import TwilioException
 
 class SendPhoneCodeSerializer(ModelSerializer):
     class Meta:
@@ -35,13 +36,16 @@ class SendPhoneCode(CreateAPIView):
         phone_auth = PhoneAuthentication.objects.create(
             phone_number=phone_number,
         )
-        phone_auth.schedule_deletion()
         
-        twilio_client.messages.create(
-            body=f"Your code for Punchme is {phone_auth.code}",
-            from_=twilio_phone_number,
-            to=str(phone_number),
-        )
+        try:
+            twilio_client.messages.create(
+                body=f"Your code for Punchme is {phone_auth.code}",
+                from_=twilio_phone_number,
+                to=str(phone_number),
+            )
+        except TwilioException as e:
+            return Response({'error': 'Failed to send message'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
         return Response(
             code_request.data,

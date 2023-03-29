@@ -18,9 +18,6 @@ djangorestframework-simplejwt="*"
 django-storages="*"
 django-cors-headers = "*"
 python-dotenv = "*"
-celery = "*"
-django-celery-results = "*"
-django-celery-beat = "*"
 
 [dev-packages]
 
