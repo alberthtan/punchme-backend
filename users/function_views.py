@@ -50,7 +50,7 @@ def update_customer(request):
 
     # Serialize the updated customer instance and return the response
     serializer = CustomerSerializer(instance)
-    return Response(serializer.data, status=200)
+    return Response({"user": serializer.data}, status=200)
 
 @api_view(['DELETE'])
 @csrf_exempt
@@ -102,7 +102,7 @@ def update_manager(request):
 
     # Serialize the updated manager instance and return the response
     serializer = ManagerSerializer(instance)
-    return Response(serializer.data, status=200)
+    return Response({"user": serializer.data}, status=200)
 
 @api_view(['DELETE'])
 @csrf_exempt
