@@ -30,6 +30,8 @@ class SendPhoneCode(CreateAPIView):
 
         phone_number = code_request.data.get('phone_number')
         
+        print("here")
+        print(phone_number)
         print(PhoneAuthentication.objects.filter(phone_number=phone_number))
         PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
         
