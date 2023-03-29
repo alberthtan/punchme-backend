@@ -18,6 +18,7 @@ djangorestframework-simplejwt="*"
 django-storages="*"
 django-cors-headers = "*"
 python-dotenv = "*"
+celery = "*"
 
 [dev-packages]
 

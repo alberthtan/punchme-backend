@@ -6,8 +6,19 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from django.utils import timezone
 
-
 from uuid import uuid4
+from celery import shared_task
+
+@shared_task
+def delete_phone_authentication_object_task(phone_authentication_id):
+    """
+    Delete a PhoneAuthentication object by ID.
+    """
+    try:
+        phone_authentication = PhoneAuthentication.objects.get(id=phone_authentication_id)
+        phone_authentication.delete()
+    except PhoneAuthentication.DoesNotExist:
+        pass
 
 def random_code():
     return "".join([str(random.randint(0, 9)) for _ in range(6)])
@@ -76,3 +87,10 @@ class PhoneAuthentication(models.Model):
     code = models.CharField(max_length=6, default=random_code)
     is_verified = models.BooleanField(default=False)
     proxy_uuid = models.UUIDField(default=uuid4)
+
+    def schedule_deletion(self):
+        """
+        Schedule the object for deletion after 10 minutes.
+        """
+        expiration_time = timezone.now() + timezone.timedelta(minutes=10)
+        delete_phone_authentication_object_task.apply_async(args=[self.id], eta=expiration_time)
