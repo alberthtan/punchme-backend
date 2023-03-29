@@ -33,7 +33,7 @@ class SendPhoneCode(CreateAPIView):
         
         print("here")
         print(phone_number)
-        print(PhoneAuthentication.objects.filter(phone_number=phone_number))
+        print(PhoneAuthentication.objects.all())
         PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
         
         phone_auth = PhoneAuthentication.objects.create(
