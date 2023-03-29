@@ -45,8 +45,8 @@ class Manager(User):
         super().save(*args, **kwargs)
 
 class Restaurant(models.Model):
-    name = models.CharField(max_length=255)
-    address = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
+    address = models.CharField(max_length=255, blank=True)
     item1 = models.CharField(max_length=255, blank=True)
     item1_points = models.IntegerField(null=True)
     item2 = models.CharField(max_length=255, blank=True)
@@ -66,6 +66,12 @@ class CustomerPoints(models.Model):
     def __str__(self):
         return f"{self.customer.username} at {self.restaurant.name} ({self.num_points} points)"
     
+class EmailAuthentication(models.Model):
+    email = models.EmailField()
+    code = models.CharField(max_length=6, default=random_code)
+    is_verified = models.BooleanField(default=False)
+    proxy_uuid = models.UUIDField(default=uuid4)
+
 class PhoneAuthentication(models.Model):
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
