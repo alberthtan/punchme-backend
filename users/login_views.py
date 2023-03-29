@@ -293,7 +293,7 @@ class LoginVerifyEmailCodeSerializer(ModelSerializer):
     class Meta:
         model = EmailAuthentication
         fields = (
-          'phone_number',
+          'email',
           'code',
         )
 
