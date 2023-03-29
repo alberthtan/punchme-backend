@@ -33,22 +33,22 @@ class SendPhoneCode(CreateAPIView):
         print("here")
         print(phone_number)
         print(PhoneAuthentication.objects.filter(phone_number=phone_number))
-        # PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
+        PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
         
-        # phone_auth = PhoneAuthentication.objects.create(
-        #     phone_number=phone_number,
-        # )
+        phone_auth = PhoneAuthentication.objects.create(
+            phone_number=phone_number,
+        )
         
-        # twilio_client.messages.create(
-        #     body=f"Your code for Punchme is {phone_auth.code}",
-        #     from_=twilio_phone_number,
-        #     to=str(phone_number),
-        # )
+        twilio_client.messages.create(
+            body=f"Your code for Punchme is {phone_auth.code}",
+            from_=twilio_phone_number,
+            to=str(phone_number),
+        )
 
-        # return Response(
-        #     code_request.data,
-        #     status.HTTP_201_CREATED,
-        # )
+        return Response(
+            code_request.data,
+            status.HTTP_201_CREATED,
+        )
 
 
 class RegisterVerifyPhoneCodeSerializer(ModelSerializer):
