@@ -118,19 +118,19 @@ def delete_manager(request):
     manager.delete()
     return Response("Manager deleted successfully.", status=200)
 
-@api_view(['POST'])
-@csrf_exempt
-def create_item(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
+# @api_view(['POST'])
+# @csrf_exempt
+# def create_item(request):
+#     if not request.user.is_authenticated or not request.user.is_active:
+#         return Response("Invalid Credentials", status=403)
     
-    email = request.data.get('email')
-    user_id = request.data.get('user_id')
+#     email = request.data.get('email')
+#     user_id = request.data.get('user_id')
 
 
-    result = StripeMerchant.objects.create(
-        user=user,
-        stripe_account_id=account.id,
-    )
-    print(result)
-    return Response({'success': account.id}, status=200)
+#     result = StripeMerchant.objects.create(
+#         user=user,
+#         stripe_account_id=account.id,
+#     )
+#     print(result)
+#     return Response({'success': account.id}, status=200)
