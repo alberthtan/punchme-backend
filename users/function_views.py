@@ -228,7 +228,7 @@ def delete_redemption(request, redemption_id):
         return Response("Item Redemption not found", status=404)
     
     try:
-        customer = Customer.objects.get(id=item_redemption.customer)
+        customer = Customer.objects.get(username=item_redemption.customer.username)
     except Customer.DoesNotExist:
         return Response("No customer associated with this item redemption", status=404)
     
