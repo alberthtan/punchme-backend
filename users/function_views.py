@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
-from users.views import ItemRedemptionSerializer, RestaurantQRSerializer
+from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, CustomerPointsSerializer
 
 
 @api_view(['GET'])
@@ -362,3 +362,19 @@ def validate_redemption(request):
 
     item_serializer = ItemSerializer(item_redemption.item)
     return Response({"message": "Item redemption used successfully", "item": item_serializer.data}, status=200)
+
+@api_view(['GET'])
+@csrf_exempt
+def get_customer_points_list(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials. Please log in.", status=403)
+
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
+    
+    customer_points_list = CustomerPoints.objects.filter(customer=customer)
+    
+    serializer = CustomerPointsSerializer(customer_points_list)
+    return Response(serializer.data, status=200)
