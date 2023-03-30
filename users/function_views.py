@@ -107,6 +107,8 @@ def update_manager(request):
                 print(restaurant_attr)
                 print(restaurant_value)
                 setattr(manager.restaurant, restaurant_attr, restaurant_value)
+            # Save the updated restaurant object
+            manager.restaurant.save()
         else:
             setattr(manager, attr, value)
 
