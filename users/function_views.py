@@ -1,14 +1,14 @@
+import uuid
 
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required, user_passes_test
 
 from rest_framework import status
 from rest_framework.response import Response
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
-from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, CustomerPointsSerializer
+from users.views import ItemRedemptionSerializer, RestaurantQRSerializer
 
 
 @api_view(['GET'])
@@ -102,10 +102,7 @@ def update_manager(request):
     # Update the manager instance with the validated data
     for attr, value in validated_data.items():
         if attr == "restaurant":
-            print("here")
             for restaurant_attr, restaurant_value in value.items():
-                print(restaurant_attr)
-                print(restaurant_value)
                 setattr(manager.restaurant, restaurant_attr, restaurant_value)
             # Save the updated restaurant object
             manager.restaurant.save()
@@ -287,12 +284,16 @@ def award_point(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
 
-    code = request.data.get('code')
-
     try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return Response("Customer not found. Please log in as a customer.", status=404)
+
+    try:
+        code = request.data.get('code')
+        uuid.UUID(code)  # Check if code is a valid UUID
+    except ValueError:
+        return Response("Invalid QR code format.", status=400)
 
     try:
         restaurant_qr = RestaurantQR.objects.get(code=code)
@@ -317,7 +318,11 @@ def validate_redemption(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
 
-    code = request.data.get('code')
+    try:
+        code = request.data.get('code')
+        uuid.UUID(code)  # Check if code is a valid UUID
+    except ValueError:
+        return Response("Invalid QR code format.", status=400)
 
     try:
         item_redemption = ItemRedemption.objects.get(code=code)
