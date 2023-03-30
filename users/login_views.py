@@ -7,7 +7,7 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.serializers import EmailField, CharField, ModelSerializer, BooleanField, SerializerMethodField
-from users.models import Customer, Manager, PhoneAuthentication, EmailAuthentication
+from users.models import Customer, Manager, PhoneAuthentication, EmailAuthentication, Restaurant
 from users.views import CustomerSerializer, ManagerSerializer
 
 from django.utils.translation import gettext_lazy as _
@@ -255,12 +255,13 @@ class RegisterVerifyEmailCode(UpdateAPIView):
         email = verify_request.data.get("email")
 
         try:
+            restaurant = Restaurant.objects.create(name='', address='')
             user = Manager.objects.create_user(
                 first_name=first_name, 
                 last_name=last_name, 
                 manager_email=email, 
                 username=email,
-                restaurant={'name': '', 'address':''}
+                restaurant=restaurant
             )
         except IntegrityError:
             return Response(
