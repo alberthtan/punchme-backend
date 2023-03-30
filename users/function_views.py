@@ -210,6 +210,14 @@ def create_redemption(request):
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return Response("Customer account not found. Please log in as a customer.", status=404)
+    
+    # Check if customer has enough points
+    try:
+        customer_points = CustomerPoints.objects.get(restaurant=item.restaurant, customer=customer)
+        if customer_points.num_points < item.num_points:
+            return Response("You do not have enough points.", status=404)
+    except CustomerPoints.DoesNotExist:
+        return Response("You do not have enough points.", status=404)
 
     item_redemption = ItemRedemption.objects.create(
         customer=customer,
@@ -272,7 +280,7 @@ def delete_qr(request, restaurant_qr_id):
         return Response("Restaurant QR object not found", status=404)
     
     if restaurant_qr.restaurant.manager.username != request.user.username:
-        return Response("Restaurant QR does not belong to your restaurant", status=403)
+        return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
     
     restaurant_qr.delete() 
 
