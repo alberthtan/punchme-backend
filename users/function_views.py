@@ -135,17 +135,35 @@ def create_item(request):
         manager = Manager.objects.get(username=request.user)
     except Manager.DoesNotExist:
         return Response("Error. Please log in as a manager.", status=404)
-    
-    try:
-        restaurant = manager.restaurant
-    except Manager.restaurant.RelatedObjectDoesNotExist:
-        return Response({'error': 'Manager does not have a restaurant.'}, status=status.HTTP_400_BAD_REQUEST)
 
     item = Item.objects.create(
         name=name,
         num_points=num_points,
-        restaurant=restaurant,
+        restaurant=manager.restaurant,
     )
 
     item_serializer = ItemSerializer(item)
     return Response({"data": item_serializer.data}, status=201)
+
+@api_view(['PATCH'])
+@csrf_exempt
+def update_item(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    item_id = request.data.get('id')
+
+    try:
+        item = Item.objects.get(id=item_id)
+    except Item.DoesNotExist:
+        return Response("Item not found", status=404)
+    
+    if item.restaurant.manager != request.user:
+        return Response("Item does not belong to your restaurant", status=403)
+
+    serializer = ItemSerializer(item, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=200)
+    else:
+        return Response(serializer.errors, status=400)
