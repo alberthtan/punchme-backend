@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from rest_framework import status
 from rest_framework.response import Response
 
-from users.models import Customer, Manager
-from users.views import CustomerSerializer, ManagerSerializer
+from users.models import Customer, Manager, Item
+from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
 
 
 @api_view(['GET'])
@@ -118,19 +118,27 @@ def delete_manager(request):
     manager.delete()
     return Response("Manager deleted successfully.", status=200)
 
-# @api_view(['POST'])
-# @csrf_exempt
-# def create_item(request):
-#     if not request.user.is_authenticated or not request.user.is_active:
-#         return Response("Invalid Credentials", status=403)
+@api_view(['POST'])
+@csrf_exempt
+def create_item(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
     
-#     email = request.data.get('email')
-#     user_id = request.data.get('user_id')
+    name = request.data.get('name')
+    num_points = request.data.get('num_points')
 
+    try:
+        manager = Manager.objects.get(username=request.user)
+    except Manager.DoesNotExist:
+        return Response("Error. Please log in as a manager.", status=404)
+    
+    restaurant = manager.restaurant
 
-#     result = StripeMerchant.objects.create(
-#         user=user,
-#         stripe_account_id=account.id,
-#     )
-#     print(result)
-#     return Response({'success': account.id}, status=200)
+    item = Item.objects.create(
+        name=name,
+        num_points=num_points,
+        restaurant=restaurant,
+    )
+
+    item_serializer = ItemSerializer(item)
+    return Response({"data": item_serializer.data}, status=201)
