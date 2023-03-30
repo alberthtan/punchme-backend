@@ -56,16 +56,15 @@ class Manager(User):
 class Restaurant(models.Model):
     name = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255, blank=True)
-    item1 = models.CharField(max_length=255, blank=True)
-    item1_points = models.IntegerField(null=True)
-    item2 = models.CharField(max_length=255, blank=True)
-    item2_points = models.IntegerField(null=True)
-    item3 = models.CharField(max_length=255, blank=True)
-    item3_points = models.IntegerField(null=True)
     manager = models.OneToOneField(Manager, on_delete=models.CASCADE, related_name='restaurant')
 
     def __str__(self):
         return self.name
+    
+class Item(models.Model):
+    name = models.CharField(max_length=255, blank=True)
+    num_points = models.IntegerField(null=True)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     
 class CustomerPoints(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)

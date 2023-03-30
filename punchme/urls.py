@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, CustomerPointsViewSet
+from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, ItemViewSet, CustomerPointsViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer
@@ -29,6 +29,7 @@ router = DefaultRouter()
 router.register(r'customers', CustomerViewSet, basename='customer')
 router.register(r'managers', ManagerViewSet, basename='manager')
 router.register(r'restaurants', RestaurantViewSet, basename='restaurant')
+router.register(r'items', ItemViewSet, basename='item')
 router.register(r'customer-points', CustomerPointsViewSet, basename='customerpoints')
 
 
