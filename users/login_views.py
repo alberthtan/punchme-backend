@@ -11,9 +11,10 @@ from users.models import Customer, Manager, PhoneAuthentication, EmailAuthentica
 from users.views import CustomerSerializer, ManagerSerializer
 
 from django.utils.translation import gettext_lazy as _
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 
 from twilio_config import twilio_client, twilio_phone_number
 from twilio.base.exceptions import TwilioException
@@ -134,42 +135,43 @@ class LoginVerifyPhoneCode(UpdateAPIView):
 
         phone_number = verify_request.data.get('phone_number')
         code = verify_request.data.get('code')
-        
+
+        customer = get_object_or_404(Customer, phone_number=phone_number)
+
         phone_auths = PhoneAuthentication.objects.filter(
             phone_number=phone_number,
             code=code,
         )
-        
+
         if not phone_auths.exists():
             return Response(
                 {
-                    'code': ['code does not match'],
+                    'code': ['Code does not match.'],
                 },
-                status.HTTP_400_BAD_REQUEST,                
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
-        phone_auths.update(is_verified=True)
-        PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
 
-        # LOGIN
         try:
-            customer = Customer.objects.get(phone_number=phone_number)
-        except ObjectDoesNotExist:
+            with transaction.atomic():
+                phone_auths.update(is_verified=True)
+                PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
+        except IntegrityError:
             return Response(
                 {
-                    'message': 'No matching user found',
+                    'message': 'Error verifying phone code.',
                 },
-                status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         customer_serializer = CustomerSerializer(customer)
         return Response(
             {
-                'message': 'Login successful',
+                'message': 'Login successful.',
                 'user': customer_serializer.data,
             },
-            status.HTTP_200_OK,
+            status=status.HTTP_200_OK,
         )
+
     
 class SendEmailCodeSerializer(ModelSerializer):
     class Meta:
@@ -302,12 +304,8 @@ class LoginVerifyEmailCode(UpdateAPIView):
         email = verify_request.data.get('email')
         code = verify_request.data.get('code')
 
-        print(email)
-        print(len(email))
-        print(code)
-        print(len(code))
-        print(EmailAuthentication.objects.all())
-        
+        manager = get_object_or_404(Manager, email=email)
+
         email_auths = EmailAuthentication.objects.filter(
             email=email,
             code=code,
@@ -316,30 +314,28 @@ class LoginVerifyEmailCode(UpdateAPIView):
         if not email_auths.exists():
             return Response(
                 {
-                    'code': ['code does not match'],
+                    'code': ['Code does not match.'],
                 },
-                status.HTTP_400_BAD_REQUEST,                
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
-        email_auths.update(is_verified=True)
-        EmailAuthentication.objects.filter(email=email).delete()
 
-        # LOGIN
         try:
-            manager = Manager.objects.get(manager_email=email)
-        except ObjectDoesNotExist:
+            with transaction.atomic():
+                email_auths.update(is_verified=True)
+                EmailAuthentication.objects.filter(email=email).delete()
+        except IntegrityError:
             return Response(
                 {
-                    'message': 'No matching user found',
+                    'message': 'Error verifying email code.',
                 },
-                status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         manager_serializer = ManagerSerializer(manager)
         return Response(
             {
-                'message': 'Login successful',
+                'message': 'Login successful.',
                 'user': manager_serializer.data,
             },
-            status.HTTP_200_OK,
+            status=status.HTTP_200_OK,
         )
