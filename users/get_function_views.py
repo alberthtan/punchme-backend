@@ -3,8 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.response import Response
 
-from users.models import Customer, Manager, CustomerPoints, Items
-from users.views import CustomerPointsSerializer, ItemSerializer
+from users.models import Customer, Manager, CustomerPoints, Item, Restaurant
+from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer
 
 @api_view(['GET'])
 @csrf_exempt
@@ -44,7 +44,21 @@ def get_items_by_restaurant(request, restaurant_id):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
     
-    items_list = Items.objects.filter(restaurant=restaurant_id)
+    items_list = Item.objects.filter(restaurant=restaurant_id)
     
     serializer = ItemSerializer(items_list, many=True)
+    return Response(serializer.data, status=200)
+
+@api_view(['GET'])
+@csrf_exempt
+def get_restaurant(request, restaurant_id):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials. Please log in.", status=403)
+    
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except Restaurant.DoesNotExist:
+        return Response("Restaurant not found", status=404)
+    
+    serializer = RestaurantSerializer(restaurant)
     return Response(serializer.data, status=200)
