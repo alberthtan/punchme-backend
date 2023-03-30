@@ -160,6 +160,11 @@ def update_item(request):
     
     print(request.user)
     print(item.restaurant.manager)
+    print(request.user == item.restaurant.manager)
+    print(type(request.user))
+    print(type(item.restaurant.manager))
+    print(len(request.user))
+    print(len(item.restaurant.manager))
     if item.restaurant.manager != request.user:
         return Response("Item does not belong to your restaurant", status=403)
 
