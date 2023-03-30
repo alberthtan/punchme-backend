@@ -375,6 +375,8 @@ def get_customer_points_list(request):
         return Response("Customer not found. Please log in as a customer.", status=404)
     
     customer_points_list = CustomerPoints.objects.filter(customer=customer)
+
+    print(customer_points_list)
     
     serializer = CustomerPointsSerializer(customer_points_list)
     return Response(serializer.data, status=200)
