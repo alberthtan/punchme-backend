@@ -259,7 +259,8 @@ class RegisterVerifyEmailCode(UpdateAPIView):
                 first_name=first_name, 
                 last_name=last_name, 
                 manager_email=email, 
-                username=email, 
+                username=email,
+                restaurant={'name': '', 'address':''}
             )
         except IntegrityError:
             return Response(
