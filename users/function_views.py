@@ -306,33 +306,39 @@ def award_point(request):
 
     return Response("Point awarded successfully.", status=200)
 
-# @api_view(['PATCH'])
-# @csrf_exempt
-# def validate_redemption(request):
-#     if not request.user.is_authenticated or not request.user.is_active:
-#         return Response("Invalid Credentials", status=403)
+@api_view(['PATCH'])
+@csrf_exempt
+def validate_redemption(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
 
-#     code = request.data.get('code')
+    code = request.data.get('code')
 
-#     try:
-#         manager = Manager.objects.get(username=request.user.username)
-#     except Manager.DoesNotExist:
-#         return Response("Manager not found. Please log in as a manager.", status=404)
+    try:
+        item_redemption = ItemRedemption.objects.get(code=code)
+    except ItemRedemption.DoesNotExist:
+        return Response("Invalid redemption.", status=404)
 
-#     try:
-#         item_redemption = ItemRedemption.objects.get(code=code)
-#     except ItemRedemption.DoesNotExist:
-#         return Response("Invalid redemption.", status=404)
-
-#     if item_redemption.restaurant.manager.username != request.user.username:
-#         return Response("Redemption QR does not belong to your restaurant", status=403)
+    if item_redemption.item.restaurant.manager.username != request.user.username:
+        return Response("Redemption QR does not belong to your restaurant", status=403)
     
-#     try:
-#         customer_points = CustomerPoints.objects.get(restaurant=restaurant, customer=customer)
-#         customer_points.num_points += 1
-#         customer_points.save()
-#     except CustomerPoints.DoesNotExist:
-#         customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1)
-#         customer_points.save()
+    num_points = item_redemption.item.num_points
+    restaurant = item_redemption.item.restaurant
+    customer = item_redemption.customer
+    
+    # Use customer points
+    try:
+        customer_points = CustomerPoints.objects.get(restaurant=restaurant, customer=customer)
+        if customer_points.num_points >= num_points:
+            customer_points.num_points -= num_points
+            customer_points.save()
+        else:
+            return Response("Customer does not have enough points.", status=404)
+    except CustomerPoints.DoesNotExist:
+        return Response("Customer does not have enough points.", status=404)
+    
+    # Delete item redemption object
+    item_redemption.delete()
 
-#     return Response("Point awarded successfully.", status=200)
+    item_serializer = ItemSerializer(item_redemption.item)
+    return Response({"message": "Item redemption used successfully", "item": item_serializer.data}, status=200)
