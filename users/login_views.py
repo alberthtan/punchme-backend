@@ -261,6 +261,12 @@ class RegisterVerifyEmailCode(UpdateAPIView):
                 manager_email=email, 
                 username=email,
             )
+
+            Restaurant.objects.create(
+                name='', 
+                address='', 
+                manager=user,
+            )
         except IntegrityError:
             return Response(
                 {
