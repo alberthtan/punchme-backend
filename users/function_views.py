@@ -158,14 +158,9 @@ def update_item(request):
     except Item.DoesNotExist:
         return Response("Item not found", status=404)
     
-    print(request.user)
-    print(item.restaurant.manager)
-    print(request.user == item.restaurant.manager)
-    print(type(request.user))
-    print(type(item.restaurant.manager))
-    print(len(request.user))
-    print(len(item.restaurant.manager))
-    if item.restaurant.manager != request.user:
+    print(request.user.username)
+    print(item.restaurant.manager.username)
+    if item.restaurant.manager.username != request.user.username:
         return Response("Item does not belong to your restaurant", status=403)
 
     serializer = ItemSerializer(item, data=request.data, partial=True)
