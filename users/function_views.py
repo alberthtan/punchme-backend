@@ -82,7 +82,11 @@ def update_manager(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
 
-    manager = request.user
+    try:
+        manager = Manager.objects.get(username=request.user)
+    except Manager.DoesNotExist:
+        return Response("Manager not found", status=404)
+    
     serializer = ManagerSerializer(manager, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
