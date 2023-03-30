@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from rest_framework import status
 from rest_framework.response import Response
 
-from users.models import Customer, Manager, Item, ItemRedemption
-from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, ItemRedemptionSerializer
+from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR
+from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, ItemRedemptionSerializer, RestaurantQRSerializer
 
 
 @api_view(['GET'])
@@ -155,7 +155,7 @@ def update_item(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
 
-    item_id = request.data.get('id')
+    item_id = request.data.get('item_id')
 
     try:
         item = Item.objects.get(id=item_id)
@@ -196,7 +196,7 @@ def create_redemption(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
 
-    item_id = request.data.get('id')
+    item_id = request.data.get('item_id')
 
     try:
         item = Item.objects.get(id=item_id)
@@ -238,3 +238,39 @@ def delete_redemption(request, redemption_id):
     item_redemption.delete() 
 
     return Response("Item redemption deleted successfully.", status=200)
+
+@api_view(['POST'])
+@csrf_exempt
+def create_qr(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    try:
+        manager = Manager.objects.get(username=request.user.username)
+    except Manager.DoesNotExist:
+        return Response("Manager not found. Please log in as a manager.", status=404)
+
+    restaurant_qr = RestaurantQR.objects.create(
+        restaurant=manager.restaurant,
+    )
+
+    restaurant_qr_serializer = RestaurantQRSerializer(restaurant_qr)
+    return Response({"data": restaurant_qr_serializer.data}, status=201)
+
+@api_view(['DELETE'])
+@csrf_exempt
+def delete_qr(request, restaurant_qr_id):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    try:
+        restaurant_qr = RestaurantQR.objects.get(id=restaurant_qr_id)
+    except RestaurantQR.DoesNotExist:
+        return Response("Restaurant QR object not found", status=404)
+    
+    if restaurant_qr.restaurant.manager.username != request.user.username:
+        return Response("Restaurant QR does not belong to your restaurant", status=403)
+    
+    restaurant_qr.delete() 
+
+    return Response("Restaurant QR deleted successfully.", status=200)
