@@ -158,8 +158,6 @@ def update_item(request):
     except Item.DoesNotExist:
         return Response("Item not found", status=404)
     
-    print(request.user.username)
-    print(item.restaurant.manager.username)
     if item.restaurant.manager.username != request.user.username:
         return Response("Item does not belong to your restaurant", status=403)
 
@@ -169,3 +167,23 @@ def update_item(request):
         return Response(serializer.data, status=200)
     else:
         return Response(serializer.errors, status=400)
+    
+@api_view(['DELETE'])
+@csrf_exempt
+def delete_item(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+    
+    item_id = request.data.get('id')
+
+    try:
+        item = Item.objects.get(id=item_id)
+    except Item.DoesNotExist:
+        return Response("Item not found", status=404)
+    
+    if item.restaurant.manager.username != request.user.username:
+        return Response("Item does not belong to your restaurant", status=403)
+    
+    item.delete() 
+    
+    return Response("Item deleted successfully.", status=200)

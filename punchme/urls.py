@@ -19,7 +19,7 @@ from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, Item
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer
-from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item
+from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item, delete_item
 
 from rest_framework.routers import DefaultRouter
 
@@ -51,6 +51,7 @@ urlpatterns = [
     path('delete-manager/', delete_manager),
     path('create-item/', create_item),
     path('update-item/', update_item),
+    path('delete-item/', delete_item),
 ]
 
 urlpatterns += router.urls
