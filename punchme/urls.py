@@ -59,7 +59,7 @@ urlpatterns = [
     path('delete-item/<int:item_id>/', delete_item),
     path('create-qr/', create_qr), # need to test
     path('delete-qr/<int:restaurant_qr_id>/', delete_qr), # need to test
-    path('validate-redemption/', validate_redemption),
+    path('validate-redemption/', validate_redemption), # need to test
 ]
 
 urlpatterns += router.urls
