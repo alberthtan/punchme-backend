@@ -48,7 +48,7 @@ class ItemSerializer(ModelSerializer):
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
-    serializer_class = RestaurantSerializer
+    serializer_class = ItemSerializer
     permission_classes = [StaffPermissions]
 
 class ManagerSerializer(ModelSerializer):
