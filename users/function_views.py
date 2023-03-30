@@ -379,4 +379,4 @@ def get_customer_points_list(request):
     print(customer_points_list)
     
     serializer = CustomerPointsSerializer(customer_points_list, many=True)
-    return Response(serializer.data, status=200, safe=False)
+    return Response(serializer.data, status=200)
