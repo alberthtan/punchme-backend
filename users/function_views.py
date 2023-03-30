@@ -158,6 +158,8 @@ def update_item(request):
     except Item.DoesNotExist:
         return Response("Item not found", status=404)
     
+    print(request.user)
+    print(item.restaurant.manager)
     if item.restaurant.manager != request.user:
         return Response("Item does not belong to your restaurant", status=403)
 
