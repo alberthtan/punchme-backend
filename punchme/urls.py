@@ -21,7 +21,7 @@ from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerif
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
 from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item, delete_item, create_qr, delete_qr, validate_redemption
-from users.function_views import get_customer_points_list
+from users.get_function_views import get_customer_points_list, get_customer_points_manager_view, get_items_by_restaurant
 
 from rest_framework.routers import DefaultRouter
 
@@ -63,8 +63,9 @@ urlpatterns = [
     path('validate-redemption/', validate_redemption), 
 
     # path('get-restaurant'), # todo
-    path('get-customer-points-list', get_customer_points_list), # todo
-    # path('get-item'), # todo
+    path('get-customer-points-list', get_customer_points_list), 
+    path('get-customer-points-manager-view', get_customer_points_manager_view),
+    path('get-items-by-restaurant', get_items_by_restaurant), 
 ]
 
 urlpatterns += router.urls
