@@ -255,13 +255,11 @@ class RegisterVerifyEmailCode(UpdateAPIView):
         email = verify_request.data.get("email")
 
         try:
-            restaurant = Restaurant.objects.create(name='', address='')
             user = Manager.objects.create_user(
                 first_name=first_name, 
                 last_name=last_name, 
                 manager_email=email, 
                 username=email,
-                restaurant=restaurant
             )
         except IntegrityError:
             return Response(
