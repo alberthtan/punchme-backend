@@ -166,7 +166,7 @@ def update_item(request):
         return Response("Item not found", status=404)
     
     if item.restaurant.manager.username != request.user.username:
-        return Response("Item does not belong to your restaurant", status=403)
+        return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
 
     serializer = ItemSerializer(item, data=request.data, partial=True)
     if serializer.is_valid():
@@ -187,7 +187,7 @@ def delete_item(request, item_id):
         return Response("Item not found", status=404)
     
     if item.restaurant.manager.username != request.user.username:
-        return Response("Item does not belong to your restaurant", status=403)
+        return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
     
     item.delete() 
 
@@ -202,14 +202,14 @@ def create_redemption(request):
     item_id = request.data.get('item_id')
 
     try:
-        item = Item.objects.get(id=item_id)
-    except Item.DoesNotExist:
-        return Response("Item not found", status=404)
-
-    try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return Response("Customer account not found. Please log in as a customer.", status=404)
+
+    try:
+        item = Item.objects.get(id=item_id)
+    except Item.DoesNotExist:
+        return Response("Item not found", status=404)
     
     # Check if customer has enough points
     try:
@@ -244,7 +244,7 @@ def delete_redemption(request, redemption_id):
         return Response("No customer associated with this item redemption", status=404)
     
     if customer.username != request.user.username:
-        return Response("Item redemption does not belong to you", status=403)
+        return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
     
     item_redemption.delete() 
 
@@ -291,6 +291,8 @@ def delete_qr(request, restaurant_qr_id):
 def award_point(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
+    
+    code = request.data.get('code')
 
     try:
         customer = Customer.objects.get(username=request.user.username)
@@ -298,7 +300,6 @@ def award_point(request):
         return Response("Customer not found. Please log in as a customer.", status=404)
 
     try:
-        code = request.data.get('code')
         uuid.UUID(code)  # Check if code is a valid UUID
     except ValueError:
         return Response("Invalid QR code format.", status=400)
@@ -326,8 +327,9 @@ def validate_redemption(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
 
+    code = request.data.get('code')
+
     try:
-        code = request.data.get('code')
         uuid.UUID(code)  # Check if code is a valid UUID
     except ValueError:
         return Response("Invalid QR code format.", status=400)
@@ -338,7 +340,7 @@ def validate_redemption(request):
         return Response("Invalid redemption.", status=404)
 
     if item_redemption.item.restaurant.manager.username != request.user.username:
-        return Response("Redemption QR does not belong to your restaurant", status=403)
+        return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
     
     num_points = item_redemption.item.num_points
     restaurant = item_redemption.item.restaurant

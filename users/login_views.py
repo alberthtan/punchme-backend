@@ -136,7 +136,7 @@ class LoginVerifyPhoneCode(UpdateAPIView):
         phone_number = verify_request.data.get('phone_number')
         code = verify_request.data.get('code')
 
-        customer = get_object_or_404(Customer, phone_number=phone_number)
+        customer = get_object_or_404(Customer, username=phone_number)
 
         phone_auths = PhoneAuthentication.objects.filter(
             phone_number=phone_number,
@@ -304,7 +304,7 @@ class LoginVerifyEmailCode(UpdateAPIView):
         email = verify_request.data.get('email')
         code = verify_request.data.get('code')
 
-        manager = get_object_or_404(Manager, email=email)
+        manager = get_object_or_404(Manager, username=email)
 
         email_auths = EmailAuthentication.objects.filter(
             email=email,
