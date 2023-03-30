@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from rest_framework import status
 from rest_framework.response import Response
 
-from users.models import Customer, Manager, Item
-from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
+from users.models import Customer, Manager, Item, ItemRedemption
+from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, ItemRedemptionSerializer
 
 
 @api_view(['GET'])
@@ -17,7 +17,7 @@ def get_customer(request):
         return Response("Invalid Credentials. Please log in.", status=403)
 
     try:
-        customer = Customer.objects.get(username=request.user)
+        customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return Response("Customer not found", status=404)
     
@@ -30,7 +30,11 @@ def update_customer(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
 
-    customer = request.user
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found", status=404)
+    
     serializer = CustomerSerializer(customer, data=request.data, partial=True)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -69,7 +73,7 @@ def get_manager(request):
         return Response("Invalid Credentials. Please log in.", status=403)
     
     try:
-        manager = Manager.objects.get(username=request.user)
+        manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
         return Response("Manager not found", status=404)
     
@@ -83,7 +87,7 @@ def update_manager(request):
         return Response("Invalid Credentials", status=403)
 
     try:
-        manager = Manager.objects.get(username=request.user)
+        manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
         return Response("Manager not found", status=404)
     
@@ -132,7 +136,7 @@ def create_item(request):
     num_points = request.data.get('num_points')
 
     try:
-        manager = Manager.objects.get(username=request.user)
+        manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
         return Response("Error. Please log in as a manager.", status=404)
 
@@ -185,5 +189,31 @@ def delete_item(request):
         return Response("Item does not belong to your restaurant", status=403)
     
     item.delete() 
-    
+
     return Response("Item deleted successfully.", status=200)
+
+@api_view(['POST'])
+@csrf_exempt
+def create_redemption(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    item_id = request.data.get('id')
+
+    try:
+        item = Item.objects.get(id=item_id)
+    except Item.DoesNotExist:
+        return Response("Item not found", status=404)
+
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer account not found. Please log in as a customer.", status=404)
+
+    item_redemption = ItemRedemption.objects.create(
+        customer=customer,
+        item=item
+    )
+
+    serializer = ItemRedemptionSerializer(item_redemption)
+    return Response({"data": serializer.data}, status=201)
