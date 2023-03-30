@@ -6,8 +6,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from rest_framework import status
 from rest_framework.response import Response
 
-from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR
-from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, ItemRedemptionSerializer, RestaurantQRSerializer
+from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
+from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
+from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, CustomerPointsSerializer
 
 
 @api_view(['GET'])
@@ -274,3 +275,33 @@ def delete_qr(request, restaurant_qr_id):
     restaurant_qr.delete() 
 
     return Response("Restaurant QR deleted successfully.", status=200)
+
+@api_view(['PATCH'])
+@csrf_exempt
+def award_point(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    code = request.data.get('code')
+
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
+
+    try:
+        restaurant_qr = RestaurantQR.objects.get(code=code)
+    except RestaurantQR.DoesNotExist:
+        return Response("Invalid QR. Please generate another.", status=404)
+    
+    restaurant = restaurant_qr.restaurant
+    
+    try:
+        customer_points = CustomerPoints.objects.get(restaurant=restaurant, customer=customer)
+        customer_points.num_points += 1
+        customer_points.save()
+    except CustomerPoints.DoesNotExist:
+        customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1)
+        customer_points.save()
+
+    return Response("Point awarded successfully.", status=200)

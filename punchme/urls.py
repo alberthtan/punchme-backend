@@ -19,7 +19,7 @@ from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, Item
 from users.views import ItemRedemptionViewSet, RestaurantQRViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
-from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption
+from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
 from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item, delete_item, create_qr, delete_qr
 
 from rest_framework.routers import DefaultRouter
@@ -49,6 +49,7 @@ urlpatterns = [
     path('delete-customer/', delete_customer),
     path('create-redemption/', create_redemption),
     path('delete-redemption/<int:redemption_id>/', delete_redemption),
+    path('award-point/', award_point),
 
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
