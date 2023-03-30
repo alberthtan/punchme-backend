@@ -132,12 +132,13 @@ def create_item(request):
     except Manager.DoesNotExist:
         return Response("Error. Please log in as a manager.", status=404)
     
-    restaurant = manager.restaurant
+    if manager.restaurant is None:
+        return Response({'error': 'Manager does not have a restaurant.'}, status=status.HTTP_400_BAD_REQUEST)
 
     item = Item.objects.create(
         name=name,
         num_points=num_points,
-        restaurant=restaurant,
+        restaurant=manager.restaurant,
     )
 
     item_serializer = ItemSerializer(item)
