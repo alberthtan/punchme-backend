@@ -62,10 +62,10 @@ urlpatterns = [
     path('delete-qr/<int:restaurant_qr_id>/', delete_qr),
     path('validate-redemption/', validate_redemption), 
 
-    path('get-restaurant', get_restaurant), 
+    path('get-restaurant/<int:restaurant_id>', get_restaurant), 
     path('get-customer-points-list', get_customer_points_list), 
     path('get-customer-points-manager-view', get_customer_points_manager_view),
-    path('get-items-by-restaurant', get_items_by_restaurant), 
+    path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant), 
 ]
 
 urlpatterns += router.urls
