@@ -46,14 +46,14 @@ urlpatterns = [
     path('update-customer/', update_customer),
     path('delete-customer/', delete_customer),
     path('create-redemption/', create_redemption),
-    path('delete-redemption/<int:redemption_id>', delete_redemption),
+    path('delete-redemption/<int:redemption_id>/', delete_redemption),
 
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
     path('delete-manager/', delete_manager),
     path('create-item/', create_item),
     path('update-item/', update_item),
-    path('delete-item/<int:item_id>', delete_item),
+    path('delete-item/<int:item_id>/', delete_item),
 ]
 
 urlpatterns += router.urls
