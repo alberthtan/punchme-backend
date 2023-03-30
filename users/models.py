@@ -78,6 +78,10 @@ class ItemRedemption(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     code = models.UUIDField(default=uuid4, editable=False)
+
+class RestaurantQR(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    code = models.UUIDField(default=uuid4, editable=False)
     
 class EmailAuthentication(models.Model):
     email = models.EmailField()

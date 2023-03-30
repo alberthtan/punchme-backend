@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from users.models import Customer, Manager, Restaurant, Item, CustomerPoints, ItemRedemption
+from users.models import Customer, Manager, Restaurant, Item, CustomerPoints, ItemRedemption, RestaurantQR
 from users.permissions import StaffPermissions
 
 from twilio_config import twilio_client, twilio_phone_number
@@ -109,4 +109,14 @@ class ItemRedemptionSerializer(ModelSerializer):
 class ItemRedemptionViewSet(viewsets.ModelViewSet):
     queryset = ItemRedemption.objects.all()
     serializer_class = ItemRedemptionSerializer
+    permission_classes = [StaffPermissions]
+
+class RestaurantQRSerializer(ModelSerializer):
+    class Meta:
+        model = RestaurantQR
+        fields = '__all__'
+
+class RestaurantQRViewSet(viewsets.ModelViewSet):
+    queryset = RestaurantQR.objects.all()
+    serializer_class = RestaurantQRSerializer
     permission_classes = [StaffPermissions]
