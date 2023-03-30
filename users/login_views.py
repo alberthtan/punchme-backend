@@ -301,6 +301,12 @@ class LoginVerifyEmailCode(UpdateAPIView):
 
         email = verify_request.data.get('email')
         code = verify_request.data.get('code')
+
+        print(email)
+        print(len(email))
+        print(code)
+        print(len(code))
+        print(EmailAuthentication.objects.all())
         
         email_auths = EmailAuthentication.objects.filter(
             email=email,

@@ -49,7 +49,7 @@ urlpatterns = [
     path('delete-customer/', delete_customer),
     path('create-redemption/', create_redemption),
     path('delete-redemption/<int:redemption_id>/', delete_redemption),
-    path('award-point/', award_point),
+    path('award-point/', award_point), # need to test
 
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
@@ -57,8 +57,8 @@ urlpatterns = [
     path('create-item/', create_item),
     path('update-item/', update_item),
     path('delete-item/<int:item_id>/', delete_item),
-    path('create-qr/', create_qr),
-    path('delete-qr/<int:restaurant_qr_id>/', delete_qr),
+    path('create-qr/', create_qr), # need to test
+    path('delete-qr/<int:restaurant_qr_id>/', delete_qr), # need to test
 ]
 
 urlpatterns += router.urls
