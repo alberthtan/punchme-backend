@@ -19,7 +19,7 @@ def get_customer(request):
     try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
-        return Response("Customer not found", status=404)
+        return Response("Customer not found. Please log in as a customer.", status=404)
     
     user_serializer = CustomerSerializer(customer)
     return Response(user_serializer.data, status=200)
@@ -33,7 +33,7 @@ def update_customer(request):
     try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
-        return Response("Customer not found", status=404)
+        return Response("Customer not found. Please log in as a customer.", status=404)
     
     serializer = CustomerSerializer(customer, data=request.data, partial=True)
     if not serializer.is_valid():
@@ -75,7 +75,7 @@ def get_manager(request):
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
-        return Response("Manager not found", status=404)
+        return Response("Manager not found. Please log in as a manager.", status=404)
     
     user_serializer = ManagerSerializer(manager)
     return Response(user_serializer.data)
@@ -89,7 +89,7 @@ def update_manager(request):
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
-        return Response("Manager not found", status=404)
+        return Response("Manager not found. Please log in as a manager.", status=404)
     
     serializer = ManagerSerializer(manager, data=request.data, partial=True)
     if not serializer.is_valid():
@@ -138,7 +138,7 @@ def create_item(request):
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
-        return Response("Error. Please log in as a manager.", status=404)
+        return Response("Manager not found. Please log in as a manager.", status=404)
 
     item = Item.objects.create(
         name=name,
@@ -174,11 +174,9 @@ def update_item(request):
     
 @api_view(['DELETE'])
 @csrf_exempt
-def delete_item(request):
+def delete_item(request, item_id):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
-    
-    item_id = request.data.get('id')
 
     try:
         item = Item.objects.get(id=item_id)
@@ -217,3 +215,26 @@ def create_redemption(request):
 
     serializer = ItemRedemptionSerializer(item_redemption)
     return Response({"data": serializer.data}, status=201)
+
+@api_view(['DELETE'])
+@csrf_exempt
+def delete_redemption(request, redemption_id):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+
+    try:
+        item_redemption = ItemRedemption.objects.get(id=redemption_id)
+    except ItemRedemption.DoesNotExist:
+        return Response("Item Redemption not found", status=404)
+    
+    try:
+        customer = Customer.objects.get(id=item_redemption.customer)
+    except Customer.DoesNotExist:
+        return Response("No customer associated with this item redemption", status=404)
+    
+    if customer.username != request.user.username:
+        return Response("Item redemption does not belong to you", status=403)
+    
+    item_redemption.delete() 
+
+    return Response("Item redemption deleted successfully.", status=200)

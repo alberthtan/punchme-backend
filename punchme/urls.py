@@ -18,7 +18,7 @@ from django.urls import path
 from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, ItemViewSet, CustomerPointsViewSet, ItemRedemptionViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
-from users.function_views import get_customer, update_customer, delete_customer, create_redemption
+from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption
 from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item, delete_item
 
 from rest_framework.routers import DefaultRouter
@@ -46,13 +46,14 @@ urlpatterns = [
     path('update-customer/', update_customer),
     path('delete-customer/', delete_customer),
     path('create-redemption/', create_redemption),
+    path('delete-redemption/<int:redemption_id>', delete_redemption),
 
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
     path('delete-manager/', delete_manager),
     path('create-item/', create_item),
     path('update-item/', update_item),
-    path('delete-item/', delete_item),
+    path('delete-item/<int:item_id>', delete_item),
 ]
 
 urlpatterns += router.urls
