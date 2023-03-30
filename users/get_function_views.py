@@ -1,5 +1,4 @@
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.response import Response
 
@@ -7,7 +6,6 @@ from users.models import Customer, Manager, CustomerPoints, Item, Restaurant
 from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer
 
 @api_view(['GET'])
-@csrf_exempt
 def get_customer_points_list(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
@@ -23,7 +21,6 @@ def get_customer_points_list(request):
     return Response(serializer.data, status=200)
 
 @api_view(['GET'])
-@csrf_exempt
 def get_customer_points_manager_view(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
@@ -39,7 +36,6 @@ def get_customer_points_manager_view(request):
     return Response(serializer.data, status=200)
 
 @api_view(['GET'])
-@csrf_exempt
 def get_items_by_restaurant(request, restaurant_id):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
@@ -50,7 +46,6 @@ def get_items_by_restaurant(request, restaurant_id):
     return Response(serializer.data, status=200)
 
 @api_view(['GET'])
-@csrf_exempt
 def get_restaurant(request, restaurant_id):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)

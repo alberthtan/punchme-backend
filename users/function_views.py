@@ -1,7 +1,6 @@
 import uuid
 
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,9 +9,7 @@ from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, 
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
 from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, CustomerPointsSerializer
 
-
 @api_view(['GET'])
-@csrf_exempt
 def get_customer(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
@@ -26,7 +23,6 @@ def get_customer(request):
     return Response(user_serializer.data, status=200)
 
 @api_view(['PATCH'])
-@csrf_exempt
 def update_customer(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -58,7 +54,6 @@ def update_customer(request):
     return Response({"user": serializer.data}, status=200)
 
 @api_view(['DELETE'])
-@csrf_exempt
 def delete_customer(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -68,7 +63,6 @@ def delete_customer(request):
     return Response("Customer deleted successfully.", status=200)
 
 @api_view(['GET'])
-@csrf_exempt
 def get_manager(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
@@ -82,7 +76,6 @@ def get_manager(request):
     return Response(user_serializer.data)
 
 @api_view(['PATCH'])
-@csrf_exempt
 def update_manager(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -120,7 +113,6 @@ def update_manager(request):
     return Response({"user": serializer.data}, status=200)
 
 @api_view(['DELETE'])
-@csrf_exempt
 def delete_manager(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -130,7 +122,6 @@ def delete_manager(request):
     return Response("Manager deleted successfully.", status=200)
 
 @api_view(['POST'])
-@csrf_exempt
 def create_item(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -153,7 +144,6 @@ def create_item(request):
     return Response({"data": item_serializer.data}, status=201)
 
 @api_view(['PATCH'])
-@csrf_exempt
 def update_item(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -176,7 +166,6 @@ def update_item(request):
         return Response(serializer.errors, status=400)
     
 @api_view(['DELETE'])
-@csrf_exempt
 def delete_item(request, item_id):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -194,7 +183,6 @@ def delete_item(request, item_id):
     return Response("Item deleted successfully.", status=200)
 
 @api_view(['POST'])
-@csrf_exempt
 def create_redemption(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -228,7 +216,6 @@ def create_redemption(request):
     return Response({"data": serializer.data}, status=201)
 
 @api_view(['DELETE'])
-@csrf_exempt
 def delete_redemption(request, redemption_id):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -251,7 +238,6 @@ def delete_redemption(request, redemption_id):
     return Response("Item redemption deleted successfully.", status=200)
 
 @api_view(['POST'])
-@csrf_exempt
 def create_qr(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -269,7 +255,6 @@ def create_qr(request):
     return Response({"data": restaurant_qr_serializer.data}, status=201)
 
 @api_view(['DELETE'])
-@csrf_exempt
 def delete_qr(request, restaurant_qr_id):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -287,7 +272,6 @@ def delete_qr(request, restaurant_qr_id):
     return Response("Restaurant QR deleted successfully.", status=200)
 
 @api_view(['PATCH'])
-@csrf_exempt
 def award_point(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
@@ -322,7 +306,6 @@ def award_point(request):
     return Response("Point awarded successfully.", status=200)
 
 @api_view(['PATCH'])
-@csrf_exempt
 def validate_redemption(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
