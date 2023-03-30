@@ -74,6 +74,11 @@ class CustomerPoints(models.Model):
     def __str__(self):
         return f"{self.customer.username} at {self.restaurant.name} ({self.num_points} points)"
     
+class ItemRedemption(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    code = models.UUIDField(default=uuid4, editable=False)
+    
 class EmailAuthentication(models.Model):
     email = models.EmailField()
     code = models.CharField(max_length=6, default=random_code)
