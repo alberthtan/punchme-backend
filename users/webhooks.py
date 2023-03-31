@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from users.function_views import generate_qr
 from users.models import Customer
 
-@api_view(['POST'])
+@api_view(['PATCH'])
 @csrf_exempt
 def generate_qr_webhook(request):
 
