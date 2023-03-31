@@ -25,6 +25,10 @@ from users.get_function_views import get_customer_points_list, get_customer_poin
 
 from rest_framework.routers import DefaultRouter
 
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
+
 
 router = DefaultRouter()
 # router.register(r'users', UserViewSet, basename='user')
@@ -37,6 +41,8 @@ router.register(r'item-redemption', ItemRedemptionViewSet, basename='itemredempt
 router.register(r'restaurant-qr', RestaurantQRViewSet, basename='restaurantqr')
 
 urlpatterns = [
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     path('admin/', admin.site.urls),
     path('send-phone-code/', SendPhoneCode.as_view()),
     path('register-verify-phone-code/', RegisterVerifyPhoneCode.as_view()),
