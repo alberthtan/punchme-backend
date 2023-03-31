@@ -319,7 +319,8 @@ def award_point(request):
 
     restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
 
-    return Response("Point awarded successfully.", status=200)
+    return Response({"message": "Point awarded successfully.",
+                     "restaurant_id": restaurant.id}, status=200)
 
 @api_view(['PATCH'])
 def validate_redemption(request):
