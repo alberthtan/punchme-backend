@@ -240,21 +240,27 @@ def delete_redemption(request, redemption_id):
 
 @api_view(['PATCH'])
 def generate_qr(request):
+    print("here1")
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
     
+    print("here2")
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
+        print("error1")
         return Response("Manager not found. Please log in as a manager.", status=404)
     
+    print("here3")
     try:
         restaurant_qr = RestaurantQR.objects.get(restaurant=manager.restaurant)
         restaurant_qr.code = uuid4()
         restaurant_qr.save()
         serializer = RestaurantQRSerializer(restaurant_qr)
+        print("here4")
         return Response(serializer.data, status=200)
     except RestaurantQR.DoesNotExist:
+        print("error2")
         return Response("Restaurant QR does not exist.", status=404)
     
 @api_view(['GET'])
