@@ -1,14 +1,16 @@
-from users.function_views import generate_qr
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 
+from users.function_views import generate_qr
+from users.models import Customer
+
+@api_view(['POST'])
 @csrf_exempt
 def generate_qr_webhook(request):
-    if request.method == 'POST':
-        # Call the generate_qr view function
-        generate_qr(request)
-        response = Response(status=200)
-        response.accepted_renderer = None  # Set accepted_renderer to None
-        return response
-    else:
-        return Response(status=405)
+
+    # Call the generate_qr function
+    response = generate_qr(request)
+
+    # Return a response to confirm that the webhook was received and processed correctly
+    return Response("Webhook received and processed.", status=200)
