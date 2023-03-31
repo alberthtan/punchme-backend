@@ -360,4 +360,6 @@ def validate_redemption(request):
     item_redemption.delete()
 
     item_serializer = ItemSerializer(item_redemption.item)
-    return Response({"message": "Item redemption used successfully", "item": item_serializer.data}, status=200)
+    return Response({"message": "Item redemption used successfully", 
+                     "item": item_serializer.data,
+                     "restaurant_id": restaurant.id}, status=200)
