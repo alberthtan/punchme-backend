@@ -13,9 +13,7 @@ from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, Custom
 
 @receiver(restaurant_signal)
 def restaurant_signal_receiver(sender, restaurant_id, **kwargs):
-    manager = sender.manager
-    # do your action here, e.g. send an email to the manager
-    print(f"Manager {manager.username} received the signal for restaurant {sender.name}!")
+    generate_new_qr_code(sender)
 
 @api_view(['GET'])
 def get_customer(request):
@@ -245,30 +243,31 @@ def delete_redemption(request, redemption_id):
 
     return Response("Item redemption deleted successfully.", status=200)
 
+def generate_new_qr_code(restaurant):
+    try:
+        restaurant_qr = RestaurantQR.objects.get(restaurant=restaurant)
+        restaurant_qr.code = uuid4()
+        restaurant_qr.save()
+    except RestaurantQR.DoesNotExist:
+        restaurant_qr = RestaurantQR(restaurant=restaurant, code=uuid4())
+        restaurant_qr.save()
+
+    restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
+    return restaurant_qr
+
 @api_view(['PATCH'])
 def generate_qr(request):
-    print("here1")
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials", status=403)
     
-    print("here2")
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
-        print("error1")
         return Response("Manager not found. Please log in as a manager.", status=404)
     
-    print("here3")
-    try:
-        restaurant_qr = RestaurantQR.objects.get(restaurant=manager.restaurant)
-        restaurant_qr.code = uuid4()
-        restaurant_qr.save()
-        serializer = RestaurantQRSerializer(restaurant_qr)
-        print("here4")
-        return Response(serializer.data, status=200)
-    except RestaurantQR.DoesNotExist:
-        print("error2")
-        return Response("Restaurant QR does not exist.", status=404)
+    restaurant_qr = generate_new_qr_code(manager.restaurant)
+    serializer = RestaurantQRSerializer(restaurant_qr)
+    return Response(serializer.data, status=200)
     
 @api_view(['GET'])
 def get_qr(request):
