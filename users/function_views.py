@@ -5,10 +5,17 @@ from rest_framework.decorators import api_view
 
 from rest_framework import status
 from rest_framework.response import Response
+from django.dispatch import receiver
 
-from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
+from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
 from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, CustomerPointsSerializer
+
+@receiver(restaurant_signal)
+def restaurant_signal_receiver(sender, restaurant_id, **kwargs):
+    manager = sender.manager
+    # do your action here, e.g. send an email to the manager
+    print(f"Manager {manager.username} received the signal for restaurant {sender.name}!")
 
 @api_view(['GET'])
 def get_customer(request):
@@ -311,6 +318,8 @@ def award_point(request):
     except CustomerPoints.DoesNotExist:
         customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1)
         customer_points.save()
+
+    restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
 
     return Response("Point awarded successfully.", status=200)
 

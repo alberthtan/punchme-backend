@@ -1,4 +1,6 @@
 import random
+import django.dispatch
+
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -7,6 +9,8 @@ from django.core.validators import RegexValidator
 from django.utils import timezone
 
 from uuid import uuid4
+
+restaurant_signal = django.dispatch.Signal(providing_args=["restaurant_id"])
 
 def random_code():
     return "".join([str(random.randint(0, 9)) for _ in range(6)])
