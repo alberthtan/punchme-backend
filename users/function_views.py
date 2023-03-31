@@ -238,40 +238,6 @@ def delete_redemption(request, redemption_id):
 
     return Response("Item redemption deleted successfully.", status=200)
 
-@api_view(['POST'])
-def create_qr(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
-    try:
-        manager = Manager.objects.get(username=request.user.username)
-    except Manager.DoesNotExist:
-        return Response("Manager not found. Please log in as a manager.", status=404)
-
-    restaurant_qr = RestaurantQR.objects.create(
-        restaurant=manager.restaurant,
-    )
-
-    restaurant_qr_serializer = RestaurantQRSerializer(restaurant_qr)
-    return Response({"data": restaurant_qr_serializer.data}, status=201)
-
-@api_view(['DELETE'])
-def delete_qr(request, restaurant_qr_id):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
-    try:
-        restaurant_qr = RestaurantQR.objects.get(id=restaurant_qr_id)
-    except RestaurantQR.DoesNotExist:
-        return Response("Restaurant QR object not found", status=404)
-    
-    if restaurant_qr.restaurant.manager.username != request.user.username:
-        return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
-    
-    restaurant_qr.delete() 
-
-    return Response("Restaurant QR deleted successfully.", status=200)
-
 @api_view(['PATCH'])
 def generate_qr(request):
     if not request.user.is_authenticated or not request.user.is_active:
