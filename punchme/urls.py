@@ -66,7 +66,7 @@ urlpatterns = [
     path('create-item/', create_item),
     path('update-item/', update_item),
     path('delete-item/<int:item_id>/', delete_item),
-    path('generate-qr/', generate_qr),
+    path('generate-qr/', generate_qr, name='generate-qr'),
     path('get-qr', get_qr),
     path('validate-redemption/', validate_redemption), 
 

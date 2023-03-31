@@ -1,10 +1,12 @@
 import uuid
+import requests
 from uuid import uuid4
 
 from rest_framework.decorators import api_view
-
 from rest_framework import status
 from rest_framework.response import Response
+from django.urls import reverse
+
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
@@ -312,7 +314,16 @@ def award_point(request):
         customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1)
         customer_points.save()
 
-    return Response("Point awarded successfully.", status=200)
+    manager = restaurant.manager
+    url = reverse('generate-qr')
+    data = {}
+    headers = {'Authorization': f'Bearer {manager.token.access}'}
+    response = requests.patch(url, data=data, headers=headers)
+
+    if response.status_code == 200:
+        return Response("Point awarded successfully.", status=200)
+    else:
+        return Response("Failed to generate QR code.", status=500)
 
 @api_view(['PATCH'])
 def validate_redemption(request):
