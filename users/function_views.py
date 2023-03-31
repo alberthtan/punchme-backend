@@ -1,4 +1,5 @@
 import uuid
+from uuid import uuid4
 
 from rest_framework.decorators import api_view
 
@@ -270,6 +271,25 @@ def delete_qr(request, restaurant_qr_id):
     restaurant_qr.delete() 
 
     return Response("Restaurant QR deleted successfully.", status=200)
+
+@api_view(['PATCH'])
+def generate_qr(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials", status=403)
+    
+    try:
+        manager = Manager.objects.get(username=request.user.username)
+    except Manager.DoesNotExist:
+        return Response("Manager not found. Please log in as a manager.", status=404)
+    
+    try:
+        restaurant_qr = RestaurantQR.get(restaurant=manager.restaurant)
+        restaurant_qr.code = uuid4()
+        restaurant_qr.save()
+        serializer = RestaurantQRSerializer(restaurant_qr)
+        return Response(serializer.data, status=200)
+    except RestaurantQR.DoesNotExist:
+        return Response("Restaurant QR does not exist.", status=404)
 
 @api_view(['PATCH'])
 def award_point(request):
