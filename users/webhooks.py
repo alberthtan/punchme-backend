@@ -7,6 +7,8 @@ def generate_qr_webhook(request):
     if request.method == 'POST':
         # Call the generate_qr view function
         generate_qr(request)
-        return Response(status=200)
+        response = Response(status=200)
+        response.accepted_renderer = None  # Set accepted_renderer to None
+        return response
     else:
         return Response(status=405)
