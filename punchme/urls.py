@@ -23,7 +23,6 @@ from users.function_views import get_customer, update_customer, delete_customer,
 from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item
 from users.function_views import delete_item, generate_qr, get_qr, validate_redemption
 from users.get_function_views import get_customer_points_list, get_customer_points_manager_view, get_items_by_restaurant, get_restaurant
-from users.webhooks import generate_qr_webhook
 
 from rest_framework.routers import DefaultRouter
 
@@ -64,8 +63,7 @@ urlpatterns = [
     path('update-manager/', update_manager),
     path('delete-manager/', delete_manager),
     path('create-item/', create_item),
-    path('update-item/', update_item),
-    path('delete-item/<int:item_id>/', delete_item),
+                           path('delete-item/<int:item_id>/', delete_item),
     path('generate-qr/', generate_qr, name='generate-qr'),
     path('get-qr', get_qr),
     path('validate-redemption/', validate_redemption), 
@@ -75,8 +73,6 @@ urlpatterns = [
     path('get-customer-points-manager-view', get_customer_points_manager_view),
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant), 
 
-    # Webhooks
-    path('generate-qr-webhook/', generate_qr_webhook, name='generate_qr_webhook'),
 ]
 
 urlpatterns += router.urls
