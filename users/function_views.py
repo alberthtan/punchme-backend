@@ -252,7 +252,6 @@ def generate_new_qr_code(restaurant):
         restaurant_qr = RestaurantQR(restaurant=restaurant, code=uuid4())
         restaurant_qr.save()
 
-    restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
     return restaurant_qr
 
 @api_view(['PATCH'])
