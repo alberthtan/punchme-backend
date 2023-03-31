@@ -283,7 +283,7 @@ def generate_qr(request):
         return Response("Manager not found. Please log in as a manager.", status=404)
     
     try:
-        restaurant_qr = RestaurantQR.get(restaurant=manager.restaurant)
+        restaurant_qr = RestaurantQR.objects.get(restaurant=manager.restaurant)
         restaurant_qr.code = uuid4()
         restaurant_qr.save()
         serializer = RestaurantQRSerializer(restaurant_qr)
