@@ -76,7 +76,7 @@ urlpatterns = [
     path('get-customer-points-manager-view', get_customer_points_manager_view),
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant), 
 
-    path('generate_ws_access_token/', generate_ws_access_token),
+    path('generate-ws-access-token/', generate_ws_access_token),
 
 ]
 
