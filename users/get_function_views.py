@@ -6,6 +6,26 @@ from users.models import Customer, Manager, CustomerPoints, Item, Restaurant
 from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer
 
 @api_view(['GET'])
+def get_customer_points(request, restaurant_id):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials. Please log in.", status=403)
+
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
+    
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except Restaurant.DoesNotExist:
+        return Response("Restaurant not found.", status=404)
+    
+    customer_points = CustomerPoints.objects.get(customer=customer, restaurant=restaurant)
+    
+    serializer = CustomerPointsSerializer(customer_points)
+    return Response(serializer.data, status=200)
+
+@api_view(['GET'])
 def get_customer_points_list(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
