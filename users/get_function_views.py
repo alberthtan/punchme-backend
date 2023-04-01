@@ -103,4 +103,4 @@ def generate_ws_access_token(request):
     # Encode the JWT token using the SECRET_KEY_WS
     token = jwt.encode(payload, os.environ.get("SECRET_KEY_WS"), algorithm="HS256")
 
-    return Response({"token": token.decode("utf-8")}, status=201)
+    return Response({"token": token.decode("utf-8")}, status=200)
