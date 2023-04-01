@@ -1,5 +1,8 @@
-from rest_framework.decorators import api_view
+import datetime
+import jwt
+import os
 
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant
@@ -77,3 +80,23 @@ def get_restaurant(request, restaurant_id):
     
     serializer = RestaurantSerializer(restaurant)
     return Response(serializer.data, status=200)
+
+@api_view(['POST'])
+def generate_ws_access_token(request):
+    if not request.user.is_authenticated or not request.user.is_active:
+        return Response("Invalid Credentials. Please log in.", status=403)
+    
+    payload = request.data.get("payload")
+    if not payload:
+        return Response("Invalid payload", status=400)
+
+    # Set the token expiry to 15 minutes
+    expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+
+    # Add the expiry time to the payload
+    payload["exp"] = int(expiry.timestamp())
+
+    # Encode the JWT token using the SECRET_KEY_WS
+    token = jwt.encode(payload, os.environ.get("SECRET_KEY_WS"), algorithm="HS256")
+
+    return token.decode("utf-8")

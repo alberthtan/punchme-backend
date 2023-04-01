@@ -23,6 +23,7 @@ from users.function_views import get_customer, update_customer, delete_customer,
 from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item
 from users.function_views import delete_item, generate_qr, get_qr, validate_redemption
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view, get_items_by_restaurant, get_restaurant
+from users.get_function_views import generate_ws_access_token
 
 from rest_framework.routers import DefaultRouter
 
@@ -74,6 +75,8 @@ urlpatterns = [
     path('get-customer-points-list', get_customer_points_list), 
     path('get-customer-points-manager-view', get_customer_points_manager_view),
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant), 
+
+    path('generate_ws_access_token/', generate_ws_access_token),
 
 ]
 
