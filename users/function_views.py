@@ -362,4 +362,5 @@ def validate_redemption(request):
 
     item_serializer = ItemSerializer(item_redemption.item)
     return Response({"message": "Item redemption used successfully", 
-                     "item": item_serializer.data}, status=200)
+                     "item": item_serializer.data,
+                     "customer_id": customer.id}, status=200)
