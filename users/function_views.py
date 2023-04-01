@@ -5,21 +5,21 @@ from rest_framework.decorators import api_view
 
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import permission_classes
 from django.dispatch import receiver
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
-from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, CustomerPointsSerializer
+from users.views import ItemRedemptionSerializer, RestaurantQRSerializer
+from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 @receiver(restaurant_signal)
 def restaurant_signal_receiver(sender, restaurant_id, **kwargs):
     generate_new_qr_code(sender)
 
 @api_view(['GET'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def get_customer(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials. Please log in.", status=403)
-
     try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
@@ -29,10 +29,8 @@ def get_customer(request):
     return Response(user_serializer.data, status=200)
 
 @api_view(['PATCH'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def update_customer(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
     try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
@@ -60,10 +58,8 @@ def update_customer(request):
     return Response({"user": serializer.data}, status=200)
 
 @api_view(['DELETE'])
-def delete_customer(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-    
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def delete_customer(request): 
     customer = request.user
     customer.delete()
     return Response("Customer deleted successfully.", status=200)
@@ -363,4 +359,5 @@ def validate_redemption(request):
     item_serializer = ItemSerializer(item_redemption.item)
     return Response({"message": "Item redemption used successfully", 
                      "item": item_serializer.data,
-                     "customer_id": customer.id}, status=200)
+                     "customer_id": customer.id,
+                     "updated_points": customer_points.num_points}, status=200)
