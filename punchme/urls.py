@@ -70,7 +70,7 @@ urlpatterns = [
     path('validate-redemption/', validate_redemption), 
 
     path('get-restaurant/<int:restaurant_id>', get_restaurant), 
-    path('get-customer-points-by-restaurant', get_customer_points),
+    path('get-customer-points-by-restaurant/<int:restaurant_id>', get_customer_points),
     path('get-customer-points-list', get_customer_points_list), 
     path('get-customer-points-manager-view', get_customer_points_manager_view),
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant), 
