@@ -86,9 +86,13 @@ def generate_ws_access_token(request):
     if not request.user.is_authenticated or not request.user.is_active:
         return Response("Invalid Credentials. Please log in.", status=403)
     
-    payload = request.data.get("payload")
-    if not payload:
-        return Response("Invalid payload", status=400)
+    id = request.data.get("id")
+    role = request.data.get("role")
+
+    if not id or not role:
+        return Response("Missing information.", status=400)
+    
+    payload = {"id": id, "role": role}
 
     # Set the token expiry to 15 minutes
     expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
