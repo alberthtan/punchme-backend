@@ -139,6 +139,8 @@ def update_restaurant(request):
 
     # Update the customer instance with the validated data
     for attr, value in validated_data.items():
+        print(attr)
+        print(value)
         setattr(restaurant, attr, value)
 
     # Save the customer instance
