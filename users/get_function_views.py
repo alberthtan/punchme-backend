@@ -80,5 +80,17 @@ def get_customer_manager_view(request, customer_id):
     except Customer.DoesNotExist:
         return Response("Customer not found", status=404)
     
+    try:
+        manager = Manager.objects.get(username=request.user.username)
+    except Manager.DoesNotExist:
+        return Response("Manager not found. Please log in as a manager", status=404)
+    
+    try:
+        CustomerPoints.objects.get(customer=customer, restaurant=manager.restaurant)
+    except CustomerPoints.DoesNotExist:
+        return Response("Customer does not have data with your restaurant", status=404)
+    
     serializer = CustomerSerializer(customer)
-    return Response(serializer.data, status=200)
+    data = serializer.data.copy()
+    data.pop('token', None)
+    return Response(data, status=200)
