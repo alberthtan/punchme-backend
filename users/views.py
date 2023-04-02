@@ -24,7 +24,7 @@ class CustomerSerializer(ModelSerializer):
     
     class Meta:
         model = Customer
-        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'token', 'phone_number']
+        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'token', 'phone_number', 'profile_picture']
 
 class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
