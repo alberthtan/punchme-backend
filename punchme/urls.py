@@ -15,8 +15,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.conf import settings
-from django.conf.urls.static import static
 from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, ItemViewSet, CustomerPointsViewSet
 from users.views import ItemRedemptionViewSet, RestaurantQRViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
@@ -82,4 +80,3 @@ urlpatterns = [
 ]
 
 urlpatterns += router.urls
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

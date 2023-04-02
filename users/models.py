@@ -12,15 +12,10 @@ from django.core.files.storage import default_storage
 
 from uuid import uuid4
 
-from storages.backends.s3boto3 import S3Boto3Storage
-
 restaurant_signal = django.dispatch.Signal()
 
 def random_code():
     return "".join([str(random.randint(0, 9)) for _ in range(6)])
-
-class S3MediaStorage(S3Boto3Storage):
-    location = settings.MEDIAFILES_LOCATION
 
 class User(AbstractUser):
     class Role(models.TextChoices):
