@@ -46,7 +46,7 @@ class Customer(User):
         message=_("Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     )
     phone_number = models.CharField(validators=[phone_regex], max_length=17, unique=True)
-    profile_picture = models.ImageField(upload_to='profiles/', storage=S3MediaStorage(), blank=True, null=True)
+    profile_picture = models.FileField(upload_to='profiles/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # check if the customer object already exists in the database

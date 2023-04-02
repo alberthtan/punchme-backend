@@ -147,7 +147,9 @@ def update_item(request):
     except Item.DoesNotExist:
         return Response("Item not found", status=404)
     
-    if item.restaurant.manager != request.user:
+    print(item.restaurant.manager.username)
+    print(request.user.username)
+    if item.restaurant.manager.username != request.user.username:
         return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
 
     serializer = ItemSerializer(item, data=request.data, partial=True)
