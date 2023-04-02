@@ -76,6 +76,23 @@ class Restaurant(models.Model):
     name = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255, blank=True)
     manager = models.OneToOneField(Manager, on_delete=models.CASCADE, related_name='restaurant')
+    restaurant_image = models.FileField(upload_to='restaurants/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        try:
+            existing_obj = Restaurant.objects.get(pk=self.pk)
+        except Restaurant.DoesNotExist:
+            pass
+        else:
+            if existing_obj.restaurant_image and existing_obj.restaurant_image != self.restaurant_image:
+                default_storage.delete(existing_obj.restaurant_image.name)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # delete the profile picture file from S3 when the object is deleted
+        if self.restaurant_image:
+            default_storage.delete(self.restaurant_image.name)
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.name
