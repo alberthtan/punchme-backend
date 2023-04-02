@@ -7,13 +7,20 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from django.utils import timezone
+from django.conf import settings
+from django.core.files.storage import default_storage
 
 from uuid import uuid4
+
+from storages.backends.s3boto3 import S3Boto3Storage
 
 restaurant_signal = django.dispatch.Signal()
 
 def random_code():
     return "".join([str(random.randint(0, 9)) for _ in range(6)])
+
+class S3MediaStorage(S3Boto3Storage):
+    location = settings.MEDIAFILES_LOCATION
 
 class User(AbstractUser):
     class Role(models.TextChoices):
@@ -33,21 +40,34 @@ class User(AbstractUser):
     def get_base_role(self):
         return self.__class__.Role.CUSTOMER if issubclass(self.__class__, Customer) else self.__class__.Role.MANAGER
 
-class Customer(User): 
+class Customer(User):
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
         message=_("Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     )
     phone_number = models.CharField(validators=[phone_regex], max_length=17, unique=True)
-    USERNAME_FIELD = 'phone_number'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.role = self.get_base_role()
+    profile_picture = models.ImageField(upload_to='profiles/', storage=S3MediaStorage(), blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        # check if the customer object already exists in the database
+        try:
+            # retrieve the existing object from the database
+            existing_obj = Customer.objects.get(pk=self.pk)
+        except Customer.DoesNotExist:
+            # the object does not exist yet, so there's nothing to delete
+            pass
+        else:
+            # if the profile picture has changed, delete the old file from S3
+            if existing_obj.profile_picture and existing_obj.profile_picture != self.profile_picture:
+                default_storage.delete(existing_obj.profile_picture.name)
         self.username = self.phone_number
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # delete the profile picture file from S3 when the object is deleted
+        if self.profile_picture:
+            default_storage.delete(self.profile_picture.name)
+        super().delete(*args, **kwargs)
 
 class Manager(User):
     manager_email = models.EmailField(_('manager email address'), unique=True)
