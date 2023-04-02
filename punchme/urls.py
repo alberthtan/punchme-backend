@@ -20,7 +20,7 @@ from users.views import ItemRedemptionViewSet, RestaurantQRViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
-from users.function_views import get_manager, update_manager, delete_manager, create_item, update_item
+from users.function_views import get_manager, update_manager, delete_manager, update_restaurant, create_item, update_item
 from users.function_views import delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view
 from users.get_function_views import get_items_by_restaurant, get_restaurant, get_customer_manager_view
@@ -63,6 +63,7 @@ urlpatterns = [
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
     path('delete-manager/', delete_manager),
+    path('update-restaurant/', update_restaurant),
     path('create-item/', create_item),
     path('update-item/', update_item),
     path('delete-item/<int:item_id>/', delete_item),

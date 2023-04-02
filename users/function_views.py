@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from django.dispatch import receiver
 
-from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints, restaurant_signal
-from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer
+from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints, Restaurant, restaurant_signal
+from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, RestaurantSerializer
 from users.views import ItemRedemptionSerializer, RestaurantQRSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
@@ -116,6 +116,40 @@ def delete_manager(request):
     manager = request.user
     manager.delete()
     return Response("Manager deleted successfully.", status=200)
+
+@api_view(['PATCH'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
+def update_restaurant(request):
+    try:
+        manager = Manager.objects.get(username=request.user.username)
+    except Manager.DoesNotExist:
+        return Response("Manager not found. Please log in as a manager.", status=404)
+    
+    try:
+        restaurant = Restaurant.objects.get(id=manager.restaurant.id)
+    except Restaurant.DoesNotExist:
+        return Response("Restaurant not found.", status=404)
+    
+    serializer = RestaurantSerializer(restaurant, data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Extract the validated data from the serializer
+    validated_data = serializer.validated_data
+
+    # Update the customer instance with the validated data
+    for attr, value in validated_data.items():
+        setattr(restaurant, attr, value)
+
+    # Save the customer instance
+    restaurant.save()
+
+    # Retrieve the updated customer instance from the database
+    instance = Restaurant.objects.get(id=restaurant.id)
+
+    # Serialize the updated customer instance and return the response
+    serializer = RestaurantSerializer(instance)
+    return Response({"restaurant": serializer.data}, status=200)
 
 @api_view(['POST'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
