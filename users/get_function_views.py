@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant
-from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer
+from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 @api_view(['GET'])
@@ -70,4 +70,15 @@ def get_restaurant(request, restaurant_id):
         return Response("Restaurant not found", status=404)
     
     serializer = RestaurantSerializer(restaurant)
+    return Response(serializer.data, status=200)
+
+@api_view(['GET'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
+def get_customer_manager_view(request, customer_id):
+    try:
+        customer = Customer.objects.get(id=customer_id)
+    except Customer.DoesNotExist:
+        return Response("Customer not found", status=404)
+    
+    serializer = CustomerSerializer(customer)
     return Response(serializer.data, status=200)
