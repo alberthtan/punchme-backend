@@ -1,4 +1,4 @@
-import uuid
+import datetime, jwt, uuid, os
 from uuid import uuid4
 
 from rest_framework.decorators import api_view
@@ -65,10 +65,8 @@ def delete_customer(request):
     return Response("Customer deleted successfully.", status=200)
 
 @api_view(['GET'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def get_manager(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials. Please log in.", status=403)
-    
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
@@ -78,10 +76,8 @@ def get_manager(request):
     return Response(user_serializer.data)
 
 @api_view(['PATCH'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def update_manager(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
@@ -115,19 +111,15 @@ def update_manager(request):
     return Response({"user": serializer.data}, status=200)
 
 @api_view(['DELETE'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def delete_manager(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-    
     manager = request.user
     manager.delete()
     return Response("Manager deleted successfully.", status=200)
 
 @api_view(['POST'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def create_item(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-    
     name = request.data.get('name')
     num_points = request.data.get('num_points')
 
@@ -146,10 +138,8 @@ def create_item(request):
     return Response({"data": item_serializer.data}, status=201)
 
 @api_view(['PATCH'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def update_item(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
     item_id = request.data.get('item_id')
 
     try:
@@ -157,7 +147,7 @@ def update_item(request):
     except Item.DoesNotExist:
         return Response("Item not found", status=404)
     
-    if item.restaurant.manager.username != request.user.username:
+    if item.restaurant.manager != request.user:
         return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
 
     serializer = ItemSerializer(item, data=request.data, partial=True)
@@ -168,16 +158,14 @@ def update_item(request):
         return Response(serializer.errors, status=400)
     
 @api_view(['DELETE'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def delete_item(request, item_id):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
     try:
         item = Item.objects.get(id=item_id)
     except Item.DoesNotExist:
         return Response("Item not found", status=404)
     
-    if item.restaurant.manager.username != request.user.username:
+    if item.restaurant.manager != request.user:
         return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
     
     item.delete() 
@@ -185,10 +173,8 @@ def delete_item(request, item_id):
     return Response("Item deleted successfully.", status=200)
 
 @api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def create_redemption(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
     item_id = request.data.get('item_id')
 
     try:
@@ -218,10 +204,8 @@ def create_redemption(request):
     return Response({"data": serializer.data}, status=201)
 
 @api_view(['DELETE'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def delete_redemption(request, redemption_id):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
     try:
         item_redemption = ItemRedemption.objects.get(id=redemption_id)
     except ItemRedemption.DoesNotExist:
@@ -233,7 +217,7 @@ def delete_redemption(request, redemption_id):
         return Response("No customer associated with this item redemption", status=404)
     
     if customer.username != request.user.username:
-        return Response("Invalid. Please log in as the manager of this restaurant.", status=403)
+        return Response("Invalid. Please log in as a customer who owns this redemption.", status=403)
     
     item_redemption.delete() 
 
@@ -251,10 +235,8 @@ def generate_new_qr_code(restaurant):
     return restaurant_qr
 
 @api_view(['PATCH'])
-def generate_qr(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-    
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
+def generate_qr(request): 
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
@@ -265,10 +247,8 @@ def generate_qr(request):
     return Response(serializer.data, status=200)
     
 @api_view(['GET'])
-def get_qr(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-    
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
+def get_qr(request): 
     try:
         manager = Manager.objects.get(username=request.user.username)
     except Manager.DoesNotExist:
@@ -282,10 +262,8 @@ def get_qr(request):
         return Response("Restaurant QR does not exist.", status=404)
 
 @api_view(['PATCH'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def award_point(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-    
     code = request.data.get('code')
 
     try:
@@ -319,10 +297,8 @@ def award_point(request):
                      "restaurant_id": restaurant.id}, status=200)
 
 @api_view(['PATCH'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def validate_redemption(request):
-    if not request.user.is_authenticated or not request.user.is_active:
-        return Response("Invalid Credentials", status=403)
-
     code = request.data.get('code')
 
     try:
@@ -349,9 +325,9 @@ def validate_redemption(request):
             customer_points.num_points -= num_points
             customer_points.save()
         else:
-            return Response("Customer does not have enough points.", status=404)
+            return Response("Customer does not have enough points.", status=400)
     except CustomerPoints.DoesNotExist:
-        return Response("Customer does not have enough points.", status=404)
+        return Response("Customer does not have enough points.", status=400)
     
     # Delete item redemption object
     item_redemption.delete()
@@ -361,3 +337,28 @@ def validate_redemption(request):
                      "item": item_serializer.data,
                      "customer_id": customer.id,
                      "updated_points": customer_points.num_points}, status=200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticatedAndActive])
+def generate_ws_access_token(request):
+    id = request.data.get("id")
+    role = request.data.get("role")
+
+    if not id or not role:
+        return Response("Missing information.", status=400)
+    
+    payload = {"id": id, "role": role}
+
+    # Set the token expiry to 15 minutes
+    expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+
+    # Add the expiry time to the payload
+    payload["exp"] = int(expiry.timestamp())
+
+    try:
+        # Encode the JWT token using the SECRET_KEY_WS
+        token = jwt.encode(payload, os.environ.get("SECRET_KEY_WS"), algorithm="HS256")
+
+        return Response({"token": token.decode("utf-8")}, status=200)
+    except Exception as e:
+        return Response(str(e), status=500)
