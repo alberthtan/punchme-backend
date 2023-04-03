@@ -26,6 +26,7 @@ class SendPhoneCodeSerializer(ModelSerializer):
         model = PhoneAuthentication
         fields = (
           'phone_number',
+          'is_register'
         )
 
 class SendPhoneCode(CreateAPIView):
