@@ -34,8 +34,19 @@ class SendPhoneCode(CreateAPIView):
         code_request.is_valid(raise_exception=True)
 
         phone_number = code_request.data.get('phone_number')
-        
+        is_register = code_request.data.get("is_register")
+
         PhoneAuthentication.objects.filter(phone_number=phone_number).delete()
+
+        if phone_number is None or is_register is None:
+            return Response("Missing information", status=400)
+        
+        customer = Customer.objects.filter(username=phone_number)
+
+        if is_register and customer.exists():
+            return Response({"error": "Phone number is already registered"}, status=400)
+        elif not is_register and not customer.exists():
+            return Response({"error": "Phone number is not registered"}, status=400)
         
         phone_auth = PhoneAuthentication.objects.create(
             phone_number=phone_number,
