@@ -1,7 +1,6 @@
 import random
 import django.dispatch
 
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -106,6 +105,7 @@ class CustomerPoints(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     num_points = models.IntegerField(default=0)
+    timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.customer.username} at {self.restaurant.name} ({self.num_points} points)"

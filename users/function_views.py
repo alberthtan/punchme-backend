@@ -1,4 +1,5 @@
 import datetime, jwt, uuid, os
+from datetime import timedelta
 from uuid import uuid4
 
 from rest_framework.decorators import api_view
@@ -7,6 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from django.dispatch import receiver
+from django.utils import timezone
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints, Restaurant, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, RestaurantSerializer
@@ -321,10 +323,14 @@ def award_point(request):
     
     try:
         customer_points = CustomerPoints.objects.get(restaurant=restaurant, customer=customer)
+        time_elapsed = timezone.now() - customer_points.timestamp
+        if time_elapsed < timedelta(seconds=10):
+            return Response("You can only earn one point every 10 seconds (TESTING).", status=400)
         customer_points.num_points += 1
+        customer_points.timestamp = timezone.now()  # Set timestamp to current time
         customer_points.save()
     except CustomerPoints.DoesNotExist:
-        customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1)
+        customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1, timestamp=timezone.now())
         customer_points.save()
 
     restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
