@@ -188,10 +188,13 @@ class LoginVerifyPhoneCode(UpdateAPIView):
 
     
 class SendEmailCodeSerializer(ModelSerializer):
+    is_register = BooleanField()
+
     class Meta:
         model = EmailAuthentication
         fields = (
           'email',
+          'is_register'
         )
 
 class SendEmailCode(CreateAPIView):
@@ -202,8 +205,19 @@ class SendEmailCode(CreateAPIView):
         code_request.is_valid(raise_exception=True)
 
         email = code_request.data.get('email')
+        is_register = code_request.data.get('is_register')
         
         EmailAuthentication.objects.filter(email=email).delete()
+
+        if email is None or is_register is None:
+            return Response("Missing information", status=400)
+        
+        manager = Manager.objects.filter(username=email)
+
+        if is_register and manager.exists():
+            return Response({"error": "User already exists"}, status=400)
+        elif not is_register and not manager.exists():
+            return Response({"error": "User does not exist"}, status=400)
         
         email_auth = EmailAuthentication.objects.create(
             email=email,
