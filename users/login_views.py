@@ -44,9 +44,9 @@ class SendPhoneCode(CreateAPIView):
         customer = Customer.objects.filter(username=phone_number)
 
         if is_register and customer.exists():
-            return Response({"error": "Phone number is already registered"}, status=400)
+            return Response({"error": "User already exists"}, status=400)
         elif not is_register and not customer.exists():
-            return Response({"error": "Phone number is not registered"}, status=400)
+            return Response({"error": "User does not exist"}, status=400)
         
         phone_auth = PhoneAuthentication.objects.create(
             phone_number=phone_number,
