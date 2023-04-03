@@ -20,6 +20,8 @@ from twilio_config import twilio_client, twilio_phone_number
 from twilio.base.exceptions import TwilioException
 
 class SendPhoneCodeSerializer(ModelSerializer):
+    is_register = BooleanField()
+
     class Meta:
         model = PhoneAuthentication
         fields = (
