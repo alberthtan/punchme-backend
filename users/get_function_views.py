@@ -106,7 +106,9 @@ def get_customer_manager_view(request, customer_id):
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def get_friends(request):
 
-    friends = Friendship.objects.filter(customer=request.user)
+    friendships = Friendship.objects.filter(customer=request.user)
+
+    friends = [friendship.friend for friendship in friendships]
     
-    serializer = FriendshipSerializer(friends, many=True)
+    serializer = CustomerSerializer(friends, many=True)
     return Response(serializer.data, status=200)
