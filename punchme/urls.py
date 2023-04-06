@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, ItemViewSet, CustomerPointsViewSet
-from users.views import ItemRedemptionViewSet, RestaurantQRViewSet
+from users.views import ItemRedemptionViewSet, RestaurantQRViewSet, FriendshipViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
@@ -41,6 +41,7 @@ router.register(r'items', ItemViewSet, basename='item')
 router.register(r'customer-points', CustomerPointsViewSet, basename='customerpoints')
 router.register(r'item-redemption', ItemRedemptionViewSet, basename='itemredemption')
 router.register(r'restaurant-qr', RestaurantQRViewSet, basename='restaurantqr')
+router.register(r'friendships', FriendshipViewSet, basename='friendship')
 
 urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
