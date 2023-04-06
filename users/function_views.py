@@ -16,6 +16,9 @@ from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, R
 from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, FriendshipSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
+from twilio_config import twilio_client, twilio_phone_number
+from twilio.base.exceptions import TwilioException
+
 @receiver(restaurant_signal)
 def restaurant_signal_receiver(sender, restaurant_id, **kwargs):
     generate_new_qr_code(sender)
@@ -411,15 +414,15 @@ def generate_ws_access_token(request):
 @api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def add_friend(request):
-    customer_id = request.data.get("customer_id")
+    username = request.data.get("phone_number")
 
-    if not customer_id:
+    if not username:
         return Response("Missing information.", status=400)
 
     try:
-        friend = Customer.objects.get(id=customer_id)
+        friend = Customer.objects.get(username=username)
     except Customer.DoesNotExist:
-        return Response("Customer not found.", status=404)
+        return Response("Customer not found", status=404)
     
     friendship = Friendship.objects.create(customer=request.user.customer, friend=friend)
 
