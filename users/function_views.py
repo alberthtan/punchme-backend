@@ -264,7 +264,9 @@ def delete_redemption(request, redemption_id):
 def generate_new_qr_code(restaurant):
     try:
         restaurant_qr = RestaurantQR.objects.get(restaurant=restaurant)
-        restaurant_qr.code = uuid4()
+        new_code = uuid4()
+        restaurant_qr.code = new_code
+        restaurant_qr.default_qr = str(new_code) + '|https://apps.apple.com/app/punchme/id6447275121'
         restaurant_qr.save()
     except RestaurantQR.DoesNotExist:
         restaurant_qr = RestaurantQR(restaurant=restaurant, code=uuid4())
