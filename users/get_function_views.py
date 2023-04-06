@@ -2,8 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 
-from users.models import Customer, Manager, CustomerPoints, Item, Restaurant
-from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer
+from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship
+from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, FriendshipSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 @api_view(['GET'])
@@ -101,3 +101,12 @@ def get_customer_manager_view(request, customer_id):
     data = serializer.data.copy()
     data.pop('token', None)
     return Response(data, status=200)
+
+@api_view(['GET'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def get_friends(request):
+
+    friends = Friendship.objects.filter(customer=request.user)
+    
+    serializer = FriendshipSerializer(friends, many=True)
+    return Response(serializer.data, status=200)

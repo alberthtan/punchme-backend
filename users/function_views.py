@@ -10,9 +10,10 @@ from rest_framework.decorators import permission_classes
 from django.dispatch import receiver
 from django.utils import timezone
 
-from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints, Restaurant, restaurant_signal
+from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
+from users.models import Friendship, Restaurant, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, RestaurantSerializer
-from users.views import ItemRedemptionSerializer, RestaurantQRSerializer
+from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, FriendshipSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 @receiver(restaurant_signal)
@@ -406,3 +407,22 @@ def generate_ws_access_token(request):
         return Response({"token": token.decode("utf-8")}, status=200)
     except Exception as e:
         return Response(str(e), status=500)
+    
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def add_friend(request):
+    customer_id = request.data.get("customer_id")
+
+    if not customer_id:
+        return Response("Missing information.", status=400)
+
+    try:
+        friend = Customer.objects.get(id=customer_id)
+    except Customer.DoesNotExist:
+        return Response("Customer not found.", status=404)
+    
+    friendship = Friendship.objects.create(customer=request.user.customer, friend=friend)
+
+    serializer = FriendshipSerializer(friendship)
+
+    return Response(serializer.data, status=201)

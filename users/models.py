@@ -63,6 +63,14 @@ class Customer(User):
             default_storage.delete(self.profile_picture.name)
         super().delete(*args, **kwargs)
 
+class Friendship(models.Model):
+    customer = models.ForeignKey(Customer, related_name='friendship_creator_set', on_delete=models.CASCADE)
+    friend = models.ForeignKey(Customer, related_name='friend_set', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('customer', 'friend')
+
 class Manager(User):
     manager_email = models.EmailField(_('manager email address'), unique=True)
     USERNAME_FIELD = 'manager_email'
