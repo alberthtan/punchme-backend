@@ -429,3 +429,28 @@ def add_friend(request):
     serializer = FriendshipSerializer(friendship)
 
     return Response(serializer.data, status=201)
+
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def invite_friend(request):
+    phone_number = request.data.get("phone_number")
+    friend_name = request.data.get("name")
+    first_name = request.user.customer.first_name
+    last_name = request.user.customer.last_name
+
+    if not phone_number:
+        return Response("Missing information.", status=400)
+
+    try:
+        twilio_client.messages.create(
+            body=f"Hey {friend_name}! \n\n \
+            {first_name} {last_name} invites you to PunchMe! The #1 social loyalty points program for free food, boba, and more! \n \
+            Download the app here and get your punches :) https://apps.apple.com/app/punchme/id6447275121 ",
+            from_=twilio_phone_number,
+            to=str(phone_number),
+        )
+    except TwilioException as e:
+        return Response({'error': 'Failed to send message'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+    return Response("message sent", status=200)
