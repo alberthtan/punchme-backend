@@ -443,9 +443,9 @@ def invite_friend(request):
 
     try:
         twilio_client.messages.create(
-            body=f"Hey {friend_name}! \n\n \
-            {first_name} {last_name} invites you to PunchMe! The #1 social loyalty points program for free food, boba, and more! \n \
-            Download the app here and get your punches :) https://apps.apple.com/app/punchme/id6447275121 ",
+            body=f"Hey {friend_name}! \n\n" +
+            f"{first_name} {last_name} invites you to PunchMe! The #1 social loyalty points program for free food, boba, and more! \n" +
+            f"Download the app here and get your punches :) https://tools.applemediaservices.com/app/6447275121?country=us",
             from_=twilio_phone_number,
             to=str(phone_number),
         )
