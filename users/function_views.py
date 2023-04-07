@@ -517,6 +517,9 @@ def create_referral(request):
     phone_number = request.data.get("phone_number")
     restaurant_id = request.data.get("restaurant_id")
 
+    print(phone_number)
+    print(restaurant_id)
+
     if not phone_number or not restaurant_id:
         return Response("Missing information.", status=400)
     
