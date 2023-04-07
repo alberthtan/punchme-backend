@@ -24,7 +24,8 @@ from users.function_views import get_manager, update_manager, delete_manager, up
 from users.function_views import delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token
 from users.function_views import add_friend, invite_friend
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view
-from users.get_function_views import get_items_by_restaurant, get_restaurant, get_customer_manager_view, get_all_restaurants, get_friends
+from users.get_function_views import get_items_by_restaurant, get_restaurant, get_customer_manager_view, get_all_restaurants
+from users.get_function_views import get_friends, has_account
 
 from rest_framework.routers import DefaultRouter
 
@@ -83,6 +84,7 @@ urlpatterns = [
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant),
     path('get-customer-manager-view/<int:customer_id>', get_customer_manager_view), 
     path('get-friends', get_friends),
+    path('has-account', has_account),
 
     path('generate-ws-access-token/', generate_ws_access_token),
 

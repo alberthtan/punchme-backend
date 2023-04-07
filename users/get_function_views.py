@@ -112,3 +112,12 @@ def get_friends(request):
     
     serializer = CustomerSerializer(friends, many=True)
     return Response(serializer.data, status=200)
+
+@api_view(['GET'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def has_account(request, phone_number):
+    try:
+        customer = Customer.objects.get(username=phone_number)
+        return Response("Customer found.", status=200)
+    except Customer.DoesNotExist:
+        return Response("Customer not found.", status=404)
