@@ -464,7 +464,7 @@ def has_accounts(request):
     
     for contact in contacts:
         if "phoneNumbers" in contact:
-            phone_number = contact.phoneNumbers[0].digits
+            phone_number = contact["phoneNumbers"][0].digits
             
             if not phone_number.startswith("+1"):
                 phone_number = "+1" + phone_number
