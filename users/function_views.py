@@ -347,7 +347,7 @@ def award_point(request):
 
 @api_view(['PATCH'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
-def give_friend_point(request):
+def send_point(request):
     phone_number = request.data.get('phone_number')
     restaurant_id = request.data.get('restaurant_id')
 
