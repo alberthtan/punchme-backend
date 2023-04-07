@@ -469,9 +469,9 @@ def has_accounts(request):
                 phone_number = "+1" + phone_number
             
             try:
-                Customer.objects.get(username=phone_number)
+                customer = Customer.objects.get(username=phone_number)
+                print(customer)
                 has_account_list.append(True)
-
             except Customer.DoesNotExist:
                 has_account_list.append(False)
         else:
