@@ -487,6 +487,10 @@ def send_point_twilio(request):
     phone_number = request.data.get("phone_number")
     friend_name = request.data.get("name")
     restaurant_id = request.data.get("restaurant_id")
+
+    print(phone_number)
+    print(friend_name)
+    print(restaurant_id)
     first_name = request.user.customer.first_name
     last_name = request.user.customer.last_name
 
@@ -516,9 +520,6 @@ def send_point_twilio(request):
 def create_referral(request):
     phone_number = request.data.get("phone_number")
     restaurant_id = request.data.get("restaurant_id")
-
-    print(phone_number)
-    print(restaurant_id)
 
     if not phone_number or not restaurant_id:
         return Response("Missing information.", status=400)
