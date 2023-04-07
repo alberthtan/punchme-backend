@@ -124,6 +124,15 @@ class ItemRedemption(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     code = models.UUIDField(default=uuid4, editable=False)
 
+class Referral(models.Model):
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message=_("Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    )
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    phone_number = models.CharField(validators=[phone_regex], max_length=17)
+
 class RestaurantQR(models.Model):
     generate_code = uuid4()
     restaurant = models.OneToOneField(Restaurant, on_delete=models.CASCADE)

@@ -11,9 +11,9 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
-from users.models import Friendship, Restaurant, restaurant_signal
+from users.models import Friendship, Restaurant, Referral, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, RestaurantSerializer
-from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, FriendshipSerializer
+from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, FriendshipSerializer, ReferralSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 from twilio_config import twilio_client, twilio_phone_number
@@ -505,6 +505,57 @@ def invite_friend(request):
     
 
     return Response("message sent", status=200)
+
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def create_referral(request):
+    phone_number = request.data.get("phone_number")
+    restaurant_id = request.data.get("restaurant_id")
+
+    if not phone_number or not restaurant_id:
+        return Response("Missing information.", status=400)
+    
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
+    
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except Restaurant.DoesNotExist:
+        return Response("Restaurant not found..", status=404)
+    
+    try:
+        referral = Referral.objects.get(phone_number=phone_number)
+        referral.customer = customer
+        referral.restaurant = restaurant
+        referral.save()
+        return Response({"message": "Referral updated successfully."}, status=200)
+    except Referral.DoesNotExist:
+        referral = Referral.objects.create(
+            customer=customer,
+            restaurant=restaurant,
+            phone_number=phone_number
+        )
+        return Response({"message": "Referral created successfully."}, status=201)
+    
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def use_referral(request):
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
+    
+    try:
+        referral = Referral.objects.get(phone_number=customer.phone_number)
+        referral.delete()
+
+        serializer = ReferralSerializer(referral)
+        return Response({"message": "Referral used successfully.",
+                         "referral": serializer.data}, status=200)
+    except Referral.DoesNotExist:
+        return Response({"error": "No referral found."}, status=404)   
 
 @api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])

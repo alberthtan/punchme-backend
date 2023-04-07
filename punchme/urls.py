@@ -16,13 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, ItemViewSet, CustomerPointsViewSet
-from users.views import ItemRedemptionViewSet, RestaurantQRViewSet, FriendshipViewSet
+from users.views import ItemRedemptionViewSet, RestaurantQRViewSet, FriendshipViewSet, ReferralViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
 from users.function_views import get_manager, update_manager, delete_manager, update_restaurant, create_item, update_item
 from users.function_views import delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token
-from users.function_views import add_friend, invite_friend, has_accounts, give_friend_point
+from users.function_views import add_friend, invite_friend, has_accounts, give_friend_point, create_referral, use_referral
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view
 from users.get_function_views import get_items_by_restaurant, get_restaurant, get_customer_manager_view, get_all_restaurants
 from users.get_function_views import get_friends
@@ -44,6 +44,7 @@ router.register(r'customer-points', CustomerPointsViewSet, basename='customerpoi
 router.register(r'item-redemption', ItemRedemptionViewSet, basename='itemredemption')
 router.register(r'restaurant-qr', RestaurantQRViewSet, basename='restaurantqr')
 router.register(r'friendships', FriendshipViewSet, basename='friendship')
+router.register(r'referrals', ReferralViewSet, basename='referral')
 
 urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -65,6 +66,8 @@ urlpatterns = [
     path('give-friend-point/', give_friend_point),
     path('add-friend/', add_friend),
     path('invite-friend/', invite_friend),
+    path('create-referral/', create_referral),
+    path('use-referral/', use_referral),
 
     path('get-manager', get_manager),
     path('update-manager/', update_manager),

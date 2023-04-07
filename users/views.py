@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from users.models import Customer, Manager, Restaurant, Item, CustomerPoints, ItemRedemption, RestaurantQR, Friendship
+from users.models import Customer, Manager, Restaurant, Item, CustomerPoints, ItemRedemption, RestaurantQR, Friendship, Referral
 from users.permissions import StaffPermissions
 
 from twilio_config import twilio_client, twilio_phone_number
@@ -39,6 +39,16 @@ class FriendshipSerializer(ModelSerializer):
 class FriendshipViewSet(viewsets.ModelViewSet):
     serializer_class = FriendshipSerializer
     queryset = Friendship.objects.all()
+    permission_classes = [StaffPermissions]
+
+class ReferralSerializer(ModelSerializer):
+    class Meta:
+        model = Referral
+        fields = '__all__'
+
+class ReferralViewSet(viewsets.ModelViewSet):
+    serializer_class = ReferralSerializer
+    queryset = Referral.objects.all()
     permission_classes = [StaffPermissions]
 
 class RestaurantSerializer(ModelSerializer):
