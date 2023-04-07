@@ -512,6 +512,11 @@ def has_accounts(request):
     contacts = request.data.get("contacts")
     account_list = []
     no_account_list = []
+
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
     
     for contact in contacts:
         if "phoneNumbers" in contact:
@@ -521,8 +526,11 @@ def has_accounts(request):
                 phone_number = "+1" + phone_number
             
             try:
-                Customer.objects.get(username=phone_number)
-                account_list.append(contact)
+                friend = Customer.objects.get(username=phone_number)
+                try:
+                    Friendship.objects.get(customer=customer, friend=friend)
+                except Friendship.DoesNotExist:
+                    account_list.append(contact)
             except Customer.DoesNotExist:
                 no_account_list.append(contact)
 

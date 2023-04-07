@@ -111,13 +111,9 @@ def get_friends(request):
     friends = [friendship.friend for friendship in friendships]
     
     serializer = CustomerSerializer(friends, many=True)
-    return Response(serializer.data, status=200)
-
-@api_view(['GET'])
-@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
-def has_account(request, phone_number):
-    try:
-        Customer.objects.get(username=phone_number)
-        return Response(200, status=200)
-    except Customer.DoesNotExist:
-        return Response(404, status=404)
+    data = serializer.data.copy()
+    
+    for friend in data:
+        friend.pop('token', None)
+    
+    return Response(data, status=200)

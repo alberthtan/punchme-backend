@@ -85,7 +85,6 @@ urlpatterns = [
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant),
     path('get-customer-manager-view/<int:customer_id>', get_customer_manager_view), 
     path('get-friends', get_friends),
-    path('has-account/<str:phone_number>', has_account),
 
     path('has-accounts/', has_accounts),
 
