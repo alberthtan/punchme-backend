@@ -566,7 +566,7 @@ def use_referral(request):
         return Response("The customer who referred you was not found.", status=404)
 
     try:
-        restaurant = Restaurant.objects.get(id=referral.restaurant) 
+        restaurant = Restaurant.objects.get(id=referral.restaurant.id) 
     except Restaurant.DoesNotExist:
         return Response("Restaurant not found.", status=404)
     
