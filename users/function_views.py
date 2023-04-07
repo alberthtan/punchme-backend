@@ -488,9 +488,6 @@ def send_point_twilio(request):
     friend_name = request.data.get("name")
     restaurant_id = request.data.get("restaurant_id")
 
-    print(phone_number)
-    print(friend_name)
-    print(restaurant_id)
     first_name = request.user.customer.first_name
     last_name = request.user.customer.last_name
 
@@ -505,8 +502,8 @@ def send_point_twilio(request):
     try:
         twilio_client.messages.create(
             body=f"Hey {friend_name}! \n\n" +
-            f"{first_name} {last_name} gave you a free point PunchMe at {restaurant.name}! The #1 social loyalty points program for free food, boba, and more! \n\n" +
-            f"Download the app here and get your points :) https://apps.apple.com/us/app/punchme/id6447275121?itsct=apps_box_link&itscg=30200",
+            f"{first_name} {last_name} gave you a free point at {restaurant.name} on PunchMe, the #1 social loyalty points program for free food, boba, and more! \n\n" +
+            f"Download the app here to redeem your point :) https://apps.apple.com/us/app/punchme/id6447275121?itsct=apps_box_link&itscg=30200",
             from_=twilio_phone_number,
             to=str(phone_number),
         )
