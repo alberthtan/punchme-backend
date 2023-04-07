@@ -84,7 +84,7 @@ urlpatterns = [
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant),
     path('get-customer-manager-view/<int:customer_id>', get_customer_manager_view), 
     path('get-friends', get_friends),
-    path('has-account', has_account),
+    path('has-account/<int:phone_number>', has_account),
 
     path('generate-ws-access-token/', generate_ws_access_token),
 
