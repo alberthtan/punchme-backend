@@ -138,10 +138,8 @@ class Referral(models.Model):
     phone_number = models.CharField(validators=[phone_regex], max_length=17)
 
 class RestaurantQR(models.Model):
-    generate_code = uuid4()
     restaurant = models.OneToOneField(Restaurant, on_delete=models.CASCADE)
-    code = models.UUIDField(default=generate_code)
-    default_qr = models.CharField(max_length=255, default=str(generate_code) + '|https://apps.apple.com/app/punchme/id6447275121')
+    code = models.UUIDField(default=uuid4)
     
 class EmailAuthentication(models.Model):
     email = models.EmailField()
