@@ -66,11 +66,13 @@ def update_customer(request):
 @api_view(['DELETE'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def delete_customer(request): 
-    customer = request.user
-    if customer.delete() == 1:
-        return Response("Customer deleted successfully.", status=200)
-    else:
-        return Response("An error occurred.", status=400)
+    username = request.user.username
+    request.user.delete()
+    try:
+        Customer.objects.get(username=username)
+        return Response(status=400)
+    except Customer.DoesNotExist:
+        return Response(status=200)
 
 @api_view(['GET'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
@@ -569,6 +571,9 @@ def use_referral(request):
         restaurant = Restaurant.objects.get(id=referral.restaurant.id) 
     except Restaurant.DoesNotExist:
         return Response("Restaurant not found.", status=404)
+    
+    customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1, timestamp=timezone.now())
+    customer_points.save()
     
     referral.delete()
     return Response({"message": "Referral used successfully.",
