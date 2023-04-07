@@ -117,7 +117,7 @@ def get_friends(request):
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def has_account(request, phone_number):
     try:
-        customer = Customer.objects.get(username=phone_number)
-        return Response("Customer found.", status=200)
+        Customer.objects.get(username=phone_number)
+        return Response(200, status=200)
     except Customer.DoesNotExist:
-        return Response("Customer not found.", status=404)
+        return Response(404, status=404)
