@@ -345,7 +345,7 @@ def award_point(request):
     return Response({"message": "Point awarded successfully.",
                      "restaurant_id": restaurant.id}, status=200)
 
-@api_view(['PATCH'])
+@api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def send_point(request):
     phone_number = request.data.get('phone_number')
