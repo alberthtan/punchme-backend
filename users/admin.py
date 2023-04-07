@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from users.models import Customer, Manager, Restaurant, Item, CustomerPoints, ItemRedemption, RestaurantQR
-from users.models import PhoneAuthentication, EmailAuthentication, Friendship, Referral
+from users.models import PhoneAuthentication, EmailAuthentication, Friendship, Referral, PushToken
 
 # Register your models here.
 
@@ -16,3 +16,4 @@ admin.site.register(PhoneAuthentication)
 admin.site.register(EmailAuthentication)
 admin.site.register(Friendship)
 admin.site.register(Referral)
+admin.site.register(PushToken)

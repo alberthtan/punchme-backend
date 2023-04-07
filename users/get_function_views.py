@@ -2,8 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 
-from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship
-from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, FriendshipSerializer
+from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken
+from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 @api_view(['GET'])
@@ -115,5 +115,21 @@ def get_friends(request):
     
     for friend in data:
         friend.pop('token', None)
+    
+    return Response(data, status=200)
+
+@api_view(['GET'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def get_push_tokens(request, phone_number):
+
+    try:
+        customer = Customer.objects.get(username=phone_number)
+    except Customer.DoesNotExist:
+        return Response("Customer not found.", status=400)
+
+    push_tokens = PushToken.objects.filter(customer=customer)
+    
+    serializer = PushTokenSerializer(push_tokens, many=True)
+    data = serializer.data.copy()
     
     return Response(data, status=200)

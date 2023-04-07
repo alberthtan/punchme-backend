@@ -11,9 +11,10 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
-from users.models import Friendship, Restaurant, Referral, restaurant_signal
+from users.models import Friendship, Restaurant, Referral, PushToken, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, RestaurantSerializer
 from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, FriendshipSerializer, ReferralSerializer
+from users.views import PushTokenSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 from twilio_config import twilio_client, twilio_phone_number
@@ -611,3 +612,22 @@ def has_accounts(request):
 
     return Response({"account_list": account_list,
                      "no_account_list": no_account_list}, status=200)
+
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def set_push_token(request):
+    token = request.data.get('token')
+
+    if not token:
+        return Response("Missing information.", status=400)
+
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
+    
+    PushToken.objects.create(
+        customer=customer,
+        token=token
+    )
+    return Response({"message": "push token created successfully"}, status=201)

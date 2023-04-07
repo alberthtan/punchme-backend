@@ -16,16 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, ItemViewSet, CustomerPointsViewSet
-from users.views import ItemRedemptionViewSet, RestaurantQRViewSet, FriendshipViewSet, ReferralViewSet
+from users.views import ItemRedemptionViewSet, RestaurantQRViewSet, FriendshipViewSet, ReferralViewSet, PushTokenViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
 from users.function_views import get_manager, update_manager, delete_manager, update_restaurant, create_item, update_item
-from users.function_views import delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token
+from users.function_views import delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token, set_push_token
 from users.function_views import add_friend, send_point_twilio, has_accounts, send_point, create_referral, use_referral
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view
 from users.get_function_views import get_items_by_restaurant, get_restaurant, get_customer_manager_view, get_all_restaurants
-from users.get_function_views import get_friends
+from users.get_function_views import get_friends, get_push_tokens
 
 from rest_framework.routers import DefaultRouter
 
@@ -45,6 +45,7 @@ router.register(r'item-redemption', ItemRedemptionViewSet, basename='itemredempt
 router.register(r'restaurant-qr', RestaurantQRViewSet, basename='restaurantqr')
 router.register(r'friendships', FriendshipViewSet, basename='friendship')
 router.register(r'referrals', ReferralViewSet, basename='referral')
+router.register(r'push-tokens', PushTokenViewSet, basename='pushtoken')
 
 urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -68,6 +69,7 @@ urlpatterns = [
     path('send-point-twilio/', send_point_twilio),
     path('create-referral/', create_referral),
     path('use-referral/', use_referral),
+    path('set-push-token/', set_push_token),
 
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
@@ -88,6 +90,7 @@ urlpatterns = [
     path('get-items-by-restaurant/<int:restaurant_id>', get_items_by_restaurant),
     path('get-customer-manager-view/<int:customer_id>', get_customer_manager_view), 
     path('get-friends', get_friends),
+    path('get-push-tokens/<str:phone_number>', get_push_tokens),
 
     path('has-accounts/', has_accounts),
 

@@ -71,6 +71,10 @@ class Friendship(models.Model):
     class Meta:
         unique_together = ('customer', 'friend')
 
+class PushToken(models.Model):
+    customer = models.ForeignKey(Customer, related_name='push_notifications', on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, db_index=True)
+
 class Manager(User):
     manager_email = models.EmailField(_('manager email address'), unique=True)
     USERNAME_FIELD = 'manager_email'
