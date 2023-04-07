@@ -114,6 +114,7 @@ class CustomerPoints(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     num_points = models.IntegerField(default=0)
     timestamp = models.DateTimeField(default=timezone.now)
+    give_point_eligible = models.BooleanField(default=False)  # to track if a customer has earned a point for friends feature
 
     def __str__(self):
         return f"{self.customer.username} at {self.restaurant.name} ({self.num_points} points)"

@@ -333,16 +333,67 @@ def award_point(request):
         # if time_elapsed < timedelta(minutes=10):
         #     return Response("You can only earn one point every 10 minutes.", status=400)
         customer_points.num_points += 1
-        customer_points.timestamp = timezone.now()  # Set timestamp to current time
+        customer_points.timestamp = timezone.now()
+        customer_points.give_point_eligible = True
         customer_points.save()
     except CustomerPoints.DoesNotExist:
-        customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1, timestamp=timezone.now())
+        customer_points = CustomerPoints(customer=customer, restaurant=restaurant, num_points=1, timestamp=timezone.now(), give_point_eligible=True)
         customer_points.save()
 
     restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
 
     return Response({"message": "Point awarded successfully.",
                      "restaurant_id": restaurant.id}, status=200)
+
+@api_view(['PATCH'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def give_friend_point(request):
+    phone_number = request.data.get('phone_number')
+    restaurant_id = request.data.get('restaurant_id')
+
+    if not phone_number or not restaurant_id:
+        return Response("Missing information", status=400)
+    
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer.", status=404)
+
+    try:
+        friend = Customer.objects.get(username=phone_number)
+    except Customer.DoesNotExist:
+        return Response("Friend not found.", status=404)
+    
+    if customer == friend:
+        return Response({"message": "You cannot give a point to yourself."}, status=400)
+
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except Restaurant.DoesNotExist:
+        return Response("Restaurant not found.", status=404)
+
+    # Check if user is eligible to give a point
+    try:
+        customer_points = CustomerPoints.objects.get(customer=customer, restaurant=restaurant)
+    except CustomerPoints.DoesNotExist:
+        return Response("You do not have any points at this restaurant.", status=404)
+    
+    if customer_points.give_point_eligible:
+        try:
+            friend_points = CustomerPoints.objects.get(customer=friend, restaurant=restaurant)
+            friend_points.num_points += 1
+            friend_points.timestamp = timezone.now()
+            friend_points.save()
+        except CustomerPoints.DoesNotExist:
+            friend_points = CustomerPoints(customer=friend, restaurant=restaurant, num_points=1, timestamp=timezone.now())
+            friend_points.save()
+        finally:
+            customer_points.give_point_eligible = False
+            customer_points.save()
+    else:
+        return Response({"message": "You are not eligible to give a point."}, status=400)
+
+    return Response({"message": "Point given successfully."}, status=200)
 
 @api_view(['PATCH'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
