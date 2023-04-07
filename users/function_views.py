@@ -555,13 +555,24 @@ def use_referral(request):
     
     try:
         referral = Referral.objects.get(phone_number=customer.phone_number)
-        referral.delete()
-
-        serializer = ReferralSerializer(referral)
-        return Response({"message": "Referral used successfully.",
-                         "referral": serializer.data}, status=200)
     except Referral.DoesNotExist:
-        return Response({"error": "No referral found."}, status=404)   
+        return Response({"error": "No referral found."}, status=404)
+
+    try:
+        friend = Customer.objects.get(id=referral.customer)
+    except Customer.DoesNotExist:
+        return Response("The customer who referred you was not found.", status=404)
+
+    try:
+        restaurant = Restaurant.objects.get(id=referral.restaurant) 
+    except Restaurant.DoesNotExist:
+        return Response("Restaurant not found.", status=404)
+    
+    referral.delete()
+    return Response({"message": "Referral used successfully.",
+                        "first_name": friend.first_name,
+                        "last_name": friend.last_name,
+                        "restaurant_name": restaurant.name}, status=200)
 
 @api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
