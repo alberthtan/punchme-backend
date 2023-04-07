@@ -459,11 +459,8 @@ def invite_friend(request):
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def has_accounts(request):
     contacts = request.data.get("contacts")
-
+    print(contacts)
     has_account_list = []
-
-    if not contacts:
-        return Response("Missing information", status=400)
     
     for contact in contacts:
         if "phoneNumbers" in contact:
@@ -480,5 +477,7 @@ def has_accounts(request):
                 has_account_list.append(False)
         else:
             has_account_list.append(False)
+
+    print(has_account_list)
 
     return Response(has_account_list, status=200)
