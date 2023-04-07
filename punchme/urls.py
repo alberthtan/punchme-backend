@@ -22,7 +22,7 @@ from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerif
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
 from users.function_views import get_manager, update_manager, delete_manager, update_restaurant, create_item, update_item
 from users.function_views import delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token
-from users.function_views import add_friend, invite_friend
+from users.function_views import add_friend, invite_friend, has_accounts
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view
 from users.get_function_views import get_items_by_restaurant, get_restaurant, get_customer_manager_view, get_all_restaurants
 from users.get_function_views import get_friends, has_account
@@ -85,6 +85,8 @@ urlpatterns = [
     path('get-customer-manager-view/<int:customer_id>', get_customer_manager_view), 
     path('get-friends', get_friends),
     path('has-account/<str:phone_number>', has_account),
+
+    path('has-accounts/', has_accounts),
 
     path('generate-ws-access-token/', generate_ws_access_token),
 

@@ -454,3 +454,31 @@ def invite_friend(request):
     
 
     return Response("message sent", status=200)
+
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def has_accounts(request):
+    contacts = request.data.get("contacts")
+
+    has_account_list = []
+
+    if not contacts:
+        return Response("Missing information", status=400)
+    
+    for contact in contacts:
+        if "phoneNumbers" in contact:
+            phone_number = contact.phoneNumber[0].digits
+            
+            if not phone_number.startswith("+1"):
+                phone_number = "+1" + phone_number
+            
+            try:
+                Customer.objects.get(username=phone_number)
+                has_account_list.append(True)
+
+            except Customer.DoesNotExist:
+                has_account_list.append(False)
+        else:
+            has_account_list.append(False)
+
+    return Response(has_account_list, status=200)
