@@ -67,8 +67,10 @@ def update_customer(request):
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def delete_customer(request): 
     customer = request.user
-    customer.delete()
-    return Response("Customer deleted successfully.", status=200)
+    if customer.delete() == 1:
+        return Response("Customer deleted successfully.", status=200)
+    else:
+        return Response("An error occurred.", status=400)
 
 @api_view(['GET'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
