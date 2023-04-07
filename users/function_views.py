@@ -559,7 +559,7 @@ def use_referral(request):
         return Response({"error": "No referral found."}, status=404)
 
     try:
-        friend = Customer.objects.get(id=referral.customer)
+        friend = Customer.objects.get(username=referral.customer)
     except Customer.DoesNotExist:
         return Response("The customer who referred you was not found.", status=404)
 
