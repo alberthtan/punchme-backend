@@ -459,7 +459,8 @@ def invite_friend(request):
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def has_accounts(request):
     contacts = request.data.get("contacts")
-    has_account_list = []
+    account_list = []
+    no_account_list = []
     
     for contact in contacts:
         if "phoneNumbers" in contact:
@@ -469,12 +470,10 @@ def has_accounts(request):
                 phone_number = "+1" + phone_number
             
             try:
-                customer = Customer.objects.get(username=phone_number)
-                print(customer)
-                has_account_list.append(True)
+                Customer.objects.get(username=phone_number)
+                account_list.append(contact)
             except Customer.DoesNotExist:
-                has_account_list.append(False)
-        else:
-            has_account_list.append(False)
+                no_account_list.append(contact)
 
-    return Response(has_account_list, status=200)
+    return Response({"account_list": account_list,
+                     "no_account_list": no_account_list}, status=200)
