@@ -669,6 +669,13 @@ def send_push_notification(request):
         'expo-token': os.environ.get('EXPO_PUSH_TOKEN'),
     }
 
+    restaurant_dict = {
+        'name': restaurant.name,
+        'address': restaurant.address,
+        'restaurant_image': restaurant.restaurant_image.url if restaurant.restaurant_image else None
+    }
+
+
     # Set up the API request body
     data = {
         'to': expo_token,
@@ -676,7 +683,7 @@ def send_push_notification(request):
         'body': f'{customer.first_name} {customer.last_name} sent you a gift!',
         'data': {
             'screen': 'Rewards',
-            'restaurant': json.dumps(restaurant)
+            'restaurant': json.dumps(restaurant_dict)
         },
     }
 
