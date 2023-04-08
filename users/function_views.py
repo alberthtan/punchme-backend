@@ -641,7 +641,7 @@ from rest_framework.response import Response
 
 @api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
-def send_push_notification(request):
+def send_point_push_notification(request):
     # Retrieve the push notification message and Expo push notification token from the request
     expo_token = request.data.get('push_token')
     restaurant_id = request.data.get('restaurant_id')
@@ -676,6 +676,11 @@ def send_push_notification(request):
         'restaurant_image': restaurant.restaurant_image.url if restaurant.restaurant_image else None
     }
 
+    customer_dict = {
+        'first_name': customer.first_name,
+        'last_name': customer.last_name,
+    }
+
 
     # Set up the API request body
     data = {
@@ -684,7 +689,8 @@ def send_push_notification(request):
         'body': f'{customer.first_name} {customer.last_name} sent you a gift!',
         'data': {
             'screen': 'Rewards',
-            'restaurant': json.dumps(restaurant_dict)
+            'restaurant': json.dumps(restaurant_dict),
+            'sender': json.dumps(customer_dict)
         },
     }
 
