@@ -644,6 +644,7 @@ from rest_framework.response import Response
 def send_push_notification(request):
     # Retrieve the push notification message and Expo push notification token from the request
     expo_token = request.data.get('push_token')
+    restaurant_id = request.data.get('restaurant_id')
 
     if not expo_token:
         return Response("Missing information.", status=400)
@@ -652,6 +653,11 @@ def send_push_notification(request):
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return response("Customer not found. Please log in as a customer.", status=404)
+    
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except Restaurant.DoesNotExist:
+        return response("Restaurant not found.", status=404)
 
     # Set up the API request headers
     headers = {
@@ -669,7 +675,9 @@ def send_push_notification(request):
         'title': 'PunchMe',
         'body': f'{customer.first_name} {customer.last_name} sent you a gift!',
         'data': {
-            'screen': 'Profile'
+            'screen': 'Rewards',
+            'restaurant_id': restaurant_id,
+            'restaurant_name': restaurant.name,
         },
     }
 
