@@ -643,9 +643,15 @@ from rest_framework.response import Response
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def send_push_notification(request):
     # Retrieve the push notification message and Expo push notification token from the request
-    message = request.data.get('message')
-
     expo_token = request.data.get('push_token')
+
+    if not expo_token:
+        return Response("Missing information.", status=400)
+    
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return response("Customer not found. Please log in as a customer.", status=404)
 
     # Set up the API request headers
     headers = {
@@ -660,15 +666,12 @@ def send_push_notification(request):
     # Set up the API request body
     data = {
         'to': expo_token,
-        'title': 'Push Notification Title',
-        'body': message,
+        'title': 'PunchMe',
+        'body': f'{customer.first_name} {customer.last_name} sent you a gift!',
         'data': {
-            'custom_data': 'custom_value',
+            'screen': 'Profile'
         },
     }
-
-    print(expo_token)
-    print(message)
 
     # Send the push notification API request to Expo
     response = requests.post('https://exp.host/--/api/v2/push/send', headers=headers, json=data)
