@@ -666,7 +666,7 @@ def send_push_notification(request):
         'content-type': 'application/json',
         'host': 'exp.host',
         'accept-language': 'en-US,en;q=0.9',
-        'expo-token': os.environ.get('EXPO_PUSH_TOKEN'),
+        'Authorization': 'Bearer ' + os.environ.get('EXPO_PUSH_TOKEN')
     }
 
     restaurant_dict = {
