@@ -626,6 +626,11 @@ def set_push_token(request):
     except Customer.DoesNotExist:
         return Response("Customer not found. Please log in as a customer.", status=404)
     
+    push_tokens = PushToken.objects.filter(customer=customer, token=token)
+
+    if push_tokens.exists():
+        return Response("Push token already exists.", status=400)
+    
     PushToken.objects.create(
         customer=customer,
         token=token
