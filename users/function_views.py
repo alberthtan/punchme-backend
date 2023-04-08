@@ -672,6 +672,6 @@ def send_push_notification(request):
 
     # Check the response status code and handle any errors
     if response.status_code == 200:
-        return Response('Push notification sent successfully.')
+        return Response('Push notification sent successfully.', status=200)
     else:
         return Response('Error sending push notification: ' + response.text, status=500)
