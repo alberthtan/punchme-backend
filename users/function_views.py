@@ -1,4 +1,4 @@
-import datetime, jwt, uuid, os, requests
+import datetime, jwt, uuid, os, requests, json
 from datetime import timedelta
 from uuid import uuid4
 
@@ -676,7 +676,7 @@ def send_push_notification(request):
         'body': f'{customer.first_name} {customer.last_name} sent you a gift!',
         'data': {
             'screen': 'Rewards',
-            'restaurant': restaurant
+            'restaurant': json.dumps(restaurant)
         },
     }
 
