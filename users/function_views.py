@@ -1,4 +1,4 @@
-import datetime, jwt, uuid, os
+import datetime, jwt, uuid, os, requests
 from datetime import timedelta
 from uuid import uuid4
 
@@ -636,3 +636,42 @@ def set_push_token(request):
         token=token
     )
     return Response({"message": "push token created successfully"}, status=201)
+
+from rest_framework.response import Response
+
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def send_push_notification(request):
+    # Retrieve the push notification message and Expo push notification token from the request
+    message = request.data.get('message')
+
+    expo_token = request.data.get('push_token')
+
+    # Set up the API request headers
+    headers = {
+        'accept': 'application/json',
+        'accept-encoding': 'gzip, deflate',
+        'content-type': 'application/json',
+        'host': 'exp.host',
+        'accept-language': 'en-US,en;q=0.9',
+        'expo-token': os.environ.get('EXPO_PUSH_TOKEN'),
+    }
+
+    # Set up the API request body
+    data = {
+        'to': expo_token,
+        'title': 'Push Notification Title',
+        'body': message,
+        'data': {
+            'custom_data': 'custom_value',
+        },
+    }
+
+    # Send the push notification API request to Expo
+    response = requests.post('https://exp.host/--/api/v2/push/send', headers=headers, json=data)
+
+    # Check the response status code and handle any errors
+    if response.status_code == 200:
+        return Response('Push notification sent successfully.')
+    else:
+        return Response('Error sending push notification: ' + response.text, status=500)
