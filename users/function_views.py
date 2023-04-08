@@ -667,6 +667,9 @@ def send_push_notification(request):
         },
     }
 
+    print(expo_token)
+    print(message)
+
     # Send the push notification API request to Expo
     response = requests.post('https://exp.host/--/api/v2/push/send', headers=headers, json=data)
 
