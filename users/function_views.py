@@ -646,7 +646,7 @@ def send_point_push_notification(request):
     expo_token = request.data.get('push_token')
     restaurant_id = request.data.get('restaurant_id')
 
-    if not expo_token:
+    if not expo_token or not restaurant_id:
         return Response("Missing information.", status=400)
     
     try:
@@ -690,6 +690,55 @@ def send_point_push_notification(request):
         'data': {
             'screen': 'Rewards',
             'restaurant': json.dumps(restaurant_dict),
+            'sender': json.dumps(customer_dict)
+        },
+    }
+
+    # Send the push notification API request to Expo
+    response = requests.post('https://exp.host/--/api/v2/push/send', headers=headers, json=data)
+
+    # Check the response status code and handle any errors
+    if response.status_code == 200:
+        return Response('Push notification sent successfully.', status=200)
+    else:
+        return Response('Error sending push notification: ' + response.text, status=500)
+
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def send_friend_request_push_notification(request):
+    # Retrieve the push notification message and Expo push notification token from the request
+    expo_token = request.data.get('push_token')
+
+    if not expo_token:
+        return Response("Missing information.", status=400)
+    
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return response("Customer not found. Please log in as a customer.", status=404)
+
+    # Set up the API request headers
+    headers = {
+        'accept': 'application/json',
+        'accept-encoding': 'gzip, deflate',
+        'content-type': 'application/json',
+        'host': 'exp.host',
+        'accept-language': 'en-US,en;q=0.9',
+        'Authorization': 'Bearer ' + os.environ.get('EXPO_PUSH_TOKEN')
+    }
+
+    customer_dict = {
+        'first_name': customer.first_name,
+        'last_name': customer.last_name,
+    }
+
+    # Set up the API request body
+    data = {
+        'to': expo_token,
+        'title': 'PunchMe',
+        'body': f'{customer.first_name} {customer.last_name} friended you!',
+        'data': {
+            'screen': 'Friends',
             'sender': json.dumps(customer_dict)
         },
     }
