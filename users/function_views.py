@@ -676,8 +676,7 @@ def send_push_notification(request):
         'body': f'{customer.first_name} {customer.last_name} sent you a gift!',
         'data': {
             'screen': 'Rewards',
-            'restaurant_id': restaurant_id,
-            'restaurant_name': restaurant.name,
+            'restaurant': restaurant
         },
     }
 
