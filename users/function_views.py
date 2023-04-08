@@ -670,6 +670,7 @@ def send_push_notification(request):
     }
 
     restaurant_dict = {
+        'id': restaurant.id,
         'name': restaurant.name,
         'address': restaurant.address,
         'restaurant_image': restaurant.restaurant_image.url if restaurant.restaurant_image else None
