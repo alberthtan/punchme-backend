@@ -73,7 +73,7 @@ class Friendship(models.Model):
 
 class PushToken(models.Model):
     customer = models.ForeignKey(Customer, related_name='push_notifications', on_delete=models.CASCADE)
-    device_id = models.CharField(max_length=255, unique=True)
+    device_id = models.CharField(max_length=255, unique=True, default='')
     token = models.CharField(max_length=255)
 
 class Manager(User):
