@@ -133,3 +133,16 @@ def get_push_tokens(request, phone_number):
     data = serializer.data.copy()
     
     return Response(data, status=200)
+
+@api_view(['POST'])
+def dummy(request):
+    path = request.data.get("path")
+    initial = request.data.get("initial_url")
+    query = request.data.get("query_params")
+    print("initial url")
+    print(initial)
+    print("path")
+    print(path)
+    print("query params")
+    print(query)
+    return Response(status=200)
