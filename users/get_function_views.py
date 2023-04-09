@@ -130,5 +130,8 @@ def get_push_tokens(request, phone_number):
     push_tokens = PushToken.objects.filter(customer=customer)
     
     serializer = PushTokenSerializer(push_tokens, many=True)
+    data = serializer.data.copy()
     
-    return Response(serializer.data, status=200)
+    for pushToken in data:
+        pushToken.pop('device_id', None)
+    return Response(data, status=200)

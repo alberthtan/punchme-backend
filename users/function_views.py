@@ -617,6 +617,7 @@ def has_accounts(request):
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def set_push_token(request):
     token = request.data.get('token')
+    device_id = request.dat.get('device_id')
 
     if not token:
         return Response("Missing information.", status=400)
@@ -633,7 +634,8 @@ def set_push_token(request):
     
     PushToken.objects.create(
         customer=customer,
-        token=token
+        token=token,
+        device_id=device_id
     )
     return Response({"message": "push token created successfully"}, status=201)
 
