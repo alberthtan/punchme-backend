@@ -603,10 +603,11 @@ def has_accounts(request):
             
             try:
                 friend = Customer.objects.get(username=phone_number)
-                try:
-                    Friendship.objects.get(customer=customer, friend=friend)
-                except Friendship.DoesNotExist:
-                    account_list.append(contact)
+                if(friend != customer):
+                    try:
+                        Friendship.objects.get(customer=customer, friend=friend)
+                    except Friendship.DoesNotExist:
+                        account_list.append(contact)
             except Customer.DoesNotExist:
                 no_account_list.append(contact)
 
