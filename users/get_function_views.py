@@ -75,7 +75,16 @@ def get_restaurant(request, restaurant_id):
 @api_view(['GET'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def get_all_restaurants(request):
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer", status=404)
+    
     restaurants = Restaurant.objects.all()
+
+    customer_points = CustomerPoints.objects.filter(customer=customer)
+    restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
+            
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
 
