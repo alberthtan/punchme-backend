@@ -347,6 +347,9 @@ def award_point(request):
 
     restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
 
+    print(restaurant)
+    print(restaurant.id)
+
     return Response({"message": "Point awarded successfully.",
                      "restaurant_id": restaurant.id}, status=200)
 
