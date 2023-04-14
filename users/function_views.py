@@ -335,7 +335,7 @@ def award_point(request):
     try:
         customer_points = CustomerPoints.objects.get(restaurant=restaurant, customer=customer)
         time_elapsed = timezone.now() - customer_points.timestamp
-        if time_elapsed < timedelta(minutes=10) and not customer.username in ["+13103872336"]:
+        if time_elapsed < timedelta(minutes=10) and not customer.username in ["+13103872336", "+13103438777"]:
             return Response("You can only earn one point every 10 minutes.", status=400)
         customer_points.num_points += 1
         customer_points.timestamp = timezone.now()
