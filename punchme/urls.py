@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from users.views import CustomerViewSet, ManagerViewSet, RestaurantViewSet, ItemViewSet, CustomerPointsViewSet
 from users.views import ItemRedemptionViewSet, RestaurantQRViewSet, FriendshipViewSet, ReferralViewSet, PushTokenViewSet
+from users.views import TransactionViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
@@ -47,10 +48,13 @@ router.register(r'restaurant-qr', RestaurantQRViewSet, basename='restaurantqr')
 router.register(r'friendships', FriendshipViewSet, basename='friendship')
 router.register(r'referrals', ReferralViewSet, basename='referral')
 router.register(r'push-tokens', PushTokenViewSet, basename='pushtoken')
+router.register(r'transactions', TransactionViewSet, basename='transaction')
+
 
 urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
+    # LOGIN / REGISTER
     path('admin/', admin.site.urls),
     path('send-phone-code/', SendPhoneCode.as_view()),
     path('register-verify-phone-code/', RegisterVerifyPhoneCode.as_view()),
@@ -59,6 +63,7 @@ urlpatterns = [
     path('register-verify-email-code/', RegisterVerifyEmailCode.as_view()),
     path('login-verify-email-code/', LoginVerifyEmailCode.as_view()),
 
+    # CUSTOMER
     path('get-customer', get_customer),
     path('update-customer/', update_customer),
     path('delete-customer/', delete_customer),
@@ -72,6 +77,7 @@ urlpatterns = [
     path('use-referral/', use_referral),
     path('set-push-token/', set_push_token),
 
+    # MANAGER
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
     path('delete-manager/', delete_manager),
@@ -79,10 +85,11 @@ urlpatterns = [
     path('create-item/', create_item),
     path('update-item/', update_item),
     path('delete-item/<int:item_id>/', delete_item),
-    path('generate-qr/', generate_qr, name='generate-qr'),
+    path('generate-qr/', generate_qr, name='generate-qr'), # this might not be called
     path('get-qr', get_qr),
     path('validate-redemption/', validate_redemption), 
 
+    # GET ENDPOINTS
     path('get-restaurant/<int:restaurant_id>', get_restaurant), 
     path('get-all-restaurants', get_all_restaurants),
     path('get-customer-points-by-restaurant/<int:restaurant_id>', get_customer_points),
@@ -93,6 +100,7 @@ urlpatterns = [
     path('get-friends', get_friends),
     path('get-push-tokens/<str:phone_number>', get_push_tokens),
 
+    # PUSH NOTIFICATION
     path('has-accounts/', has_accounts),
     path('send-point-push-notification/', send_point_push_notification),
     path('send-friend-request-push-notification/', send_friend_request_push_notification),

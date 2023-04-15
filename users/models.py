@@ -140,6 +140,14 @@ class Referral(models.Model):
 class RestaurantQR(models.Model):
     restaurant = models.OneToOneField(Restaurant, on_delete=models.CASCADE)
     code = models.UUIDField(default=uuid4)
+
+class Transaction(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    customer_string = models.TextField()
+    transaction_date = models.DateTimeField(default=timezone.now)
+    transaction_type = models.CharField(max_length=6) # point or redeem
+    transaction_reward = models.CharField(max_length=255, null=True, blank=True) # item in transaction if reward
+    num_points = models.IntegerField() # number of points involved in the transaction
     
 class EmailAuthentication(models.Model):
     email = models.EmailField()

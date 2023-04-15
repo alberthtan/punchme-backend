@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from users.models import Customer, Manager, Restaurant, Item, CustomerPoints, ItemRedemption, RestaurantQR, Friendship, Referral, PushToken
+from users.models import Customer, Manager, Restaurant, Item, CustomerPoints, ItemRedemption, RestaurantQR, Friendship, Referral
+from users.models import PushToken, Transaction
 from users.permissions import StaffPermissions
 
 from twilio_config import twilio_client, twilio_phone_number
@@ -49,6 +50,16 @@ class PushTokenSerializer(ModelSerializer):
 class PushTokenViewSet(viewsets.ModelViewSet):
     serializer_class = PushTokenSerializer
     queryset = PushToken.objects.all()
+    permission_classes = [StaffPermissions]
+
+class TransactionSerializer(ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    serializer_class = TransactionSerializer
+    queryset = Transaction.objects.all()
     permission_classes = [StaffPermissions]
 
 class ReferralSerializer(ModelSerializer):
