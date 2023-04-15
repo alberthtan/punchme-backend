@@ -2,8 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 
-from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken
-from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer
+from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
+from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer, TransactionSerializer
 from users.permissions import CustomerPermissions, ManagerPermissions, IsAuthenticatedAndActive
 
 @api_view(['GET'])
@@ -110,6 +110,24 @@ def get_customer_manager_view(request, customer_id):
     data = serializer.data.copy()
     data.pop('token', None)
     return Response(data, status=200)
+
+@api_view(['GET'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
+def get_transactions_by_customer(request, customer_id):
+    try:
+        customer = Customer.objects.get(id=customer_id)
+    except Customer.DoesNotExist:
+        return Response("Customer not found", status=404)
+    
+    try:
+        manager = Manager.objects.get(username=request.user.username)
+    except Manager.DoesNotExist:
+        return Response("Manager not found. Please log in as a manager", status=404)
+    
+    transactions = Transaction.objects.filter(customer=customer, restaurant=manager.restaurant)
+    
+    serializer = TransactionSerializer(transactions, many=True)
+    return Response(serializer.data, status=200)
 
 @api_view(['GET'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
