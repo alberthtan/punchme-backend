@@ -21,8 +21,8 @@ from users.views import TransactionViewSet
 from users.login_views import SendPhoneCode, RegisterVerifyPhoneCode, LoginVerifyPhoneCode
 from users.login_views import SendEmailCode, RegisterVerifyEmailCode, LoginVerifyEmailCode
 from users.function_views import get_customer, update_customer, delete_customer, create_redemption, delete_redemption, award_point
-from users.function_views import get_manager, update_manager, delete_manager, update_restaurant, create_item, update_item
-from users.function_views import delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token, set_push_token
+from users.function_views import get_manager, update_manager, delete_manager, delete_manager_request, update_restaurant, create_item
+from users.function_views import  update_item, delete_item, generate_qr, get_qr, validate_redemption, generate_ws_access_token, set_push_token
 from users.function_views import add_friend, send_point_twilio, has_accounts, send_point, create_referral, use_referral
 from users.function_views import send_point_push_notification, send_friend_request_push_notification
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view
@@ -81,6 +81,7 @@ urlpatterns = [
     path('get-manager', get_manager),
     path('update-manager/', update_manager),
     path('delete-manager/', delete_manager),
+    path('delete-manager-request/', delete_manager_request),
     path('update-restaurant/', update_restaurant),
     path('create-item/', create_item),
     path('update-item/', update_item),

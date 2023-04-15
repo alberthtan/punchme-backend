@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from django.dispatch import receiver
 from django.utils import timezone
+from django.core.mail import send_mail
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
 from users.models import Friendship, Restaurant, Referral, PushToken, Transaction, restaurant_signal
@@ -127,6 +128,21 @@ def delete_manager(request):
     manager = request.user
     manager.delete()
     return Response("Manager deleted successfully.", status=200)
+
+@api_view(['POST'])
+@permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
+def delete_manager_request(request):
+    manager = request.user
+    try:
+        send_mail(
+            subject="Delete Manager Request",
+            message=f"{manager.first_name} {manager.last_name} would like to delete their account. Account ID: {manager.id}",
+            from_email=os.environ.get('EMAIL_HOST_USER'),
+            recipient_list=['dutchpay@dutchpay.co']
+        )
+    except Exception as e:
+        # Log the error or handle it as appropriate for your application
+        print(f"An error occurred while sending email: {e}")
 
 @api_view(['PATCH'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
