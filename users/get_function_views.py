@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
@@ -124,9 +126,15 @@ def get_transactions_by_customer(request, customer_id):
     except Manager.DoesNotExist:
         return Response("Manager not found. Please log in as a manager", status=404)
     
-    transactions = Transaction.objects.filter(customer=customer, restaurant=manager.restaurant)
-    
-    serializer = TransactionSerializer(transactions, many=True)
+    transactions = Transaction.objects.filter(restaurant=manager.restaurant)
+    customer_transactions = []
+
+    for transaction in transactions:
+        transaction_customer_id = json.loads(transaction.customer_string)['id']
+        if transaction_customer_id == customer_id:
+            customer_transactions.append(transaction)
+
+    serializer = TransactionSerializer(customer_transactions, many=True)
     return Response(serializer.data, status=200)
 
 @api_view(['GET'])
