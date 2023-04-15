@@ -143,6 +143,9 @@ def delete_manager_request(request):
     except Exception as e:
         # Log the error or handle it as appropriate for your application
         print(f"An error occurred while sending email: {e}")
+        return Response(status=400)
+    
+    return Response(status=200)
 
 @api_view(['PATCH'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
