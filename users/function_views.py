@@ -11,7 +11,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
-from users.models import Friendship, Restaurant, Referral, PushToken, restaurant_signal
+from users.models import Friendship, Restaurant, Referral, PushToken, Transaction, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, RestaurantSerializer
 from users.views import ItemRedemptionSerializer, RestaurantQRSerializer, FriendshipSerializer, ReferralSerializer
 from users.views import PushTokenSerializer
@@ -347,8 +347,19 @@ def award_point(request):
 
     restaurant_signal.send(sender=restaurant, restaurant_id=restaurant.id)
 
-    print(restaurant)
-    print(restaurant.id)
+    customer_dict = {
+        "first_name": customer.first_name,
+        "last_name": customer.last_name,
+        "id": customer.id,
+    }
+
+    transaction = Transaction(
+        restaurant=restaurant, 
+        customer_string=json.dumps(customer_dict),
+        transaction_type="point",
+        num_points=1,
+    )
+    transaction.save()
 
     return Response({"message": "Point awarded successfully.",
                      "restaurant_id": restaurant.id}, status=200)
@@ -438,6 +449,21 @@ def validate_redemption(request):
     
     # Delete item redemption object
     item_redemption.delete()
+
+    customer_dict = {
+        "first_name": customer.first_name,
+        "last_name": customer.last_name,
+        "id": customer.id,
+    }
+
+    transaction = Transaction(
+        restaurant=restaurant, 
+        customer_string=json.dumps(customer_dict),
+        transaction_type="reward",
+        transaction_reward=item_redemption.item.name,
+        num_points=num_points,
+    )
+    transaction.save()
 
     item_serializer = ItemSerializer(item_redemption.item)
     return Response({"message": "Item redemption used successfully", 
