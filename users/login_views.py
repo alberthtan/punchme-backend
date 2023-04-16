@@ -354,12 +354,12 @@ class LoginVerifyEmailCode(UpdateAPIView):
         )
         
         if not email_auths.exists():
-            employee_code = manager.employee_code
+            employee_code = str(manager.employee_code)
             print(employee_code)
             print(code)
             print(type(employee_code))
             print(type(code))
-            if int(code) == employee_code and employee_code != 0:
+            if code == employee_code and employee_code != '0':
                 email_auths.update(is_verified=True)
                 EmailAuthentication.objects.filter(email=email).delete()
                 manager_serializer = ManagerSerializer(manager)
