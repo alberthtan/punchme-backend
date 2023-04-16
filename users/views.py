@@ -112,7 +112,7 @@ class ManagerSerializer(ModelSerializer):
 
     class Meta:
         model = Manager
-        fields = ['id', 'first_name', 'last_name', 'manager_email', 'username', 'token', 'restaurant']
+        fields = ['id', 'first_name', 'last_name', 'manager_email', 'username', 'token', 'restaurant', 'employee_code']
 
 class ManagerViewSet(viewsets.ModelViewSet):
     queryset = Manager.objects.all()
