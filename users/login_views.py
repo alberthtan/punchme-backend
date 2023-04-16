@@ -359,7 +359,10 @@ class LoginVerifyEmailCode(UpdateAPIView):
             print(code)
             print(type(employee_code))
             print(type(code))
+            print(code == employee_code)
+            print(code == employee_code and employee_code != '0')
             if code == employee_code and employee_code != '0':
+                print("here")
                 email_auths.update(is_verified=True)
                 EmailAuthentication.objects.filter(email=email).delete()
                 manager_serializer = ManagerSerializer(manager)
@@ -372,13 +375,13 @@ class LoginVerifyEmailCode(UpdateAPIView):
                 },
                 status=status.HTTP_200_OK
                 )
-
-            return Response(
-                {
-                    'code': ['Code does not match.'],
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            else:
+                return Response(
+                    {
+                        'code': ['Code does not match.'],
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         try:
             with transaction.atomic():
