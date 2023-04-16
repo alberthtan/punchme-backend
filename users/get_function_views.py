@@ -4,6 +4,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+from django.db.models import FloatField
+from django.db.models.functions import Cast
+from django.contrib.gis.geos import Point, Distance
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
 from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer, TransactionSerializer
@@ -100,22 +104,54 @@ def get_restaurants_by_location(request):
     if not latitude or not longitude:
         return Response('Missing information', status=400)
     
-    geolocator = Nominatim(user_agent='PunchmeManager')
-    location = geolocator.reverse(f"{latitude}, {longitude}")
-    city = location.raw['address'].get('city')
+    # geolocator = Nominatim(user_agent='PunchmeManager')
+    # location = geolocator.reverse(f"{latitude}, {longitude}")
+    # city = location.raw['address'].get('city')
     
     try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return Response("Customer not found. Please log in as a customer", status=404)
     
-    restaurants = Restaurant.objects.filter(address__contains=f'"city":"{city}"')
+    # Convert user's latitude and longitude to a Point object
+    user_location = Point(latitude, longitude)
+
+    # Filter restaurants within a certain radius (in this example, 5 kilometers)
+    radius = 5  # in kilometers
+    restaurants = Restaurant.objects.filter(
+        address__distance_lte=(user_location, Distance(km=radius))
+    )
+
+    # Calculate the distance between each restaurant and the user's location
+    for restaurant in restaurants:
+        restaurant_latitude, restaurant_longitude = get_lat_long_from_address(restaurant.address)
+        restaurant_location = Point(restaurant_longitude, restaurant_latitude)
+        distance_in_km = geodesic(user_location, restaurant_location).km
+
+        # Add the distance to the restaurant object as a computed field
+        restaurant.distance = distance_in_km
+
+    # Sort the restaurants by distance
+    restaurants = sorted(restaurants, key=lambda r: r.distance)
+    
+    # restaurants = Restaurant.objects.filter(address__contains=f'"city":"{city}"')
 
     customer_points = CustomerPoints.objects.filter(customer=customer)
     restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
             
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
+
+def get_lat_long_from_address(address):
+    # Parse the address and extract the latitude and longitude
+    geolocator = Nominatim(user_agent='PunchmeManager')
+
+    location = geolocator.geocode(f"{address['street_address']}, {address['city']}, {address['state']} {address['zip_code']}")
+
+    latitude = location.latitude
+    longitude = location.longitude
+
+    return latitude, longitude
 
 @api_view(['GET'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
