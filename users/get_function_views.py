@@ -90,6 +90,8 @@ def get_all_restaurants(request):
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
 
+
+
 @api_view(['GET'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])
 def get_customer_manager_view(request, customer_id):
