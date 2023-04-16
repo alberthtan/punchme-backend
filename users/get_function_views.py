@@ -1,9 +1,8 @@
-import json
+import json, os
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
-from geopy.geocoders import Nominatim
 from mapbox import Geocoder
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
@@ -101,9 +100,9 @@ def get_restaurants_by_location(request):
     if not latitude or not longitude:
         return Response('Missing information', status=400)
     
-    geolocator = Nominatim(user_agent='PunchmeManager')
-    location = geolocator.reverse(f"{latitude}, {longitude}")
-    city = location.raw['address'].get('city')
+    geocoder = Geocoder(access_token=os.environ.get('MAPBOX_API_KEY'))
+    response = geocoder.forward(f"{longitude},{latitude}")
+    city = response.geojson()['features'][0]['context'][0]['text']
     
     try:
         customer = Customer.objects.get(username=request.user.username)
