@@ -8,7 +8,6 @@ from geopy.distance import geodesic
 from django.db.models import FloatField
 from django.db.models.functions import Cast
 from django.contrib.gis.geos import Point, Distance
-from geopy.exc import GeocoderTimedOut, GeocoderUnavailable
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
 from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer, TransactionSerializer
@@ -147,13 +146,7 @@ def get_lat_long_from_address(address):
     # Parse the address and extract the latitude and longitude
     geolocator = Nominatim(user_agent='PunchmeManager')
 
-    try:
-        location = geolocator.geocode(f"{address['street_address']}, {address['city']}, {address['state']} {address['zip_code']}")
-    except (GeocoderTimedOut, GeocoderUnavailable):
-        return None  # handle the error by returning None
-
-    if location is None:
-        return None  # handle the case where no location was found for the address
+    location = geolocator.geocode(f"{address['street_address']}, {address['city']}, {address['state']} {address['zip_code']}")
 
     latitude = location.latitude
     longitude = location.longitude
