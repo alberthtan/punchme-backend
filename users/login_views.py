@@ -1,4 +1,4 @@
-import os
+import os, json
 
 from rest_framework import generics, status
 from rest_framework.views import APIView
@@ -305,7 +305,7 @@ class RegisterVerifyEmailCode(UpdateAPIView):
             )
             restaurant = Restaurant.objects.create(
                 name='', 
-                address='', 
+                address=json.dumps({'street_address': '', 'city': '', 'state': '', 'zip_code': ''}), 
                 manager=user,
             )
             RestaurantQR.objects.create(
