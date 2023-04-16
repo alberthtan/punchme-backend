@@ -77,6 +77,7 @@ class PushToken(models.Model):
 
 class Manager(User):
     manager_email = models.EmailField(_('manager email address'), unique=True)
+    employee_code = models.PositiveIntegerField(_('employee code'), default=None)
     USERNAME_FIELD = 'manager_email'
 
     def save(self, *args, **kwargs):

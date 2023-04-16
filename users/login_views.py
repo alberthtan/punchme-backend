@@ -354,6 +354,19 @@ class LoginVerifyEmailCode(UpdateAPIView):
         )
         
         if not email_auths.exists():
+            employee_code = manager.employee_code
+            if code == employee_code and employee_code != None:
+                email_auths.update(is_verified=True)
+                EmailAuthentication.objects.filter(email=email).delete()
+                manager_serializer = ManagerSerializer(manager)
+                employee = manager_serializer.data
+                employee.pop('employee_code', None)
+                return Response(
+                {
+                    'message': 'Employee login successful.',
+                    'employee': manager_serializer.data,
+                })
+
             return Response(
                 {
                     'code': ['Code does not match.'],
