@@ -103,6 +103,8 @@ def get_restaurants_by_location(request):
     geocoder = Geocoder(access_token=os.environ.get('MAPBOX_API_KEY'))
     response = geocoder.forward(f"{longitude},{latitude}")
     city = response.geojson()['features'][0]['context'][0]['text']
+    print(response.geojson())
+    print(city)
     
     try:
         customer = Customer.objects.get(username=request.user.username)
