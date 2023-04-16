@@ -234,8 +234,7 @@ class SendEmailCode(CreateAPIView):
             email_auth = EmailAuthentication.objects.create(
                 email=email,
             )
-            print(manager)
-            while email_auth.code == manager.employee_code:
+            while email_auth.code == manager[0].employee_code:
                 print("hello")
                 EmailAuthentication.objects.filter(email=email).delete()
                 email_auth = EmailAuthentication.objects.create(
