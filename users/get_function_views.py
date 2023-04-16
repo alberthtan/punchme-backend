@@ -3,6 +3,7 @@ import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
+from geopy.geocoders import Nominatim
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
 from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer, TransactionSerializer
@@ -90,7 +91,31 @@ def get_all_restaurants(request):
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
 
+@api_view(['POST'])
+@permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
+def get_restaurants_by_location(request):
+    latitude = request.data.get('latitude')
+    longitude = request.data.get('longitude')
 
+    if not latitude or not longitude:
+        return Response('Missing information', status=400)
+    
+    geolocator = Nominatim(user_agent='PunchmeManager')
+    location = geolocator.reverse(f"{latitude}, {longitude}")
+    city = location.raw['address'].get('city')
+    
+    try:
+        customer = Customer.objects.get(username=request.user.username)
+    except Customer.DoesNotExist:
+        return Response("Customer not found. Please log in as a customer", status=404)
+    
+    restaurants = Restaurant.objects.filter(address__contains=f'"city":"{city}"')
+
+    customer_points = CustomerPoints.objects.filter(customer=customer)
+    restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
+            
+    serializer = RestaurantSerializer(restaurants, many=True)
+    return Response(serializer.data, status=200)
 
 @api_view(['GET'])
 @permission_classes([ManagerPermissions, IsAuthenticatedAndActive])

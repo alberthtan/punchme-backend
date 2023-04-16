@@ -27,7 +27,7 @@ from users.function_views import add_friend, send_point_twilio, has_accounts, se
 from users.function_views import send_point_push_notification, send_friend_request_push_notification
 from users.get_function_views import get_customer_points, get_customer_points_list, get_customer_points_manager_view
 from users.get_function_views import get_items_by_restaurant, get_restaurant, get_customer_manager_view, get_all_restaurants
-from users.get_function_views import get_friends, get_push_tokens, get_transactions_by_customer, dummy
+from users.get_function_views import get_friends, get_push_tokens, get_transactions_by_customer, get_restaurants_by_location, dummy
 
 from rest_framework.routers import DefaultRouter
 
@@ -94,6 +94,7 @@ urlpatterns = [
     # GET ENDPOINTS
     path('get-restaurant/<int:restaurant_id>', get_restaurant), 
     path('get-all-restaurants', get_all_restaurants),
+    path('get-restaurants-by-location/', get_restaurants_by_location),
     path('get-customer-points-by-restaurant/<int:restaurant_id>', get_customer_points),
     path('get-customer-points-list', get_customer_points_list), 
     path('get-customer-points-manager-view', get_customer_points_manager_view),
