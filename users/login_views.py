@@ -369,7 +369,9 @@ class LoginVerifyEmailCode(UpdateAPIView):
                 {
                     'message': 'Employee login successful.',
                     'employee': manager_serializer.data,
-                })
+                },
+                status=status.HTTP_200_OK
+                )
 
             return Response(
                 {
