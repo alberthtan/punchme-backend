@@ -1,9 +1,13 @@
 import json, os
 
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
+from django.contrib.gis.geos import Point
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from mapbox import Geocoder
+from geopy.geocoders import MapBox
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
 from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer, TransactionSerializer
@@ -91,6 +95,15 @@ def get_all_restaurants(request):
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
 
+def geocode_address(address_str, access_token):
+    geolocator = MapBox(api_key=access_token)
+    location = geolocator.geocode(address_str)
+
+    if location is None:
+        return None
+
+    return Point(location.longitude, location.latitude)
+
 @api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def get_restaurants_by_location(request):
@@ -100,18 +113,25 @@ def get_restaurants_by_location(request):
     if not latitude or not longitude:
         return Response('Missing information', status=400)
     
-    geocoder = Geocoder(access_token=os.environ.get('MAPBOX_API_KEY'))
-    response = geocoder.forward(f"{longitude},{latitude}")
-    city = response.geojson()['features'][0]['context'][0]['text']
-    print(response.geojson())
-    print(city)
-    
     try:
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return Response("Customer not found. Please log in as a customer", status=404)
     
-    restaurants = Restaurant.objects.filter(address__contains=f'"city":"{city}"')
+    mapbox_api_key = os.environ.get('MAPBOX_API_KEY')
+    user_location = Point(float(latitude), float(longitude))
+
+    restaurants = []
+    for restaurant in Restaurant.objects.all():
+        address = restaurant.address
+        coordinates = geocode_address(address, mapbox_api_key)
+        if coordinates is None:
+            continue
+        restaurant_location = Point(coordinates['longitude'], coordinates['latitude'])
+        distance = user_location.distance(restaurant_location).miles
+        if distance <= 5:
+            restaurant.distance = distance
+            restaurants.append(restaurant)
 
     customer_points = CustomerPoints.objects.filter(customer=customer)
     restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
