@@ -1,12 +1,8 @@
 import json, os
 
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.measure import D
-from django.contrib.gis.geos import Point
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
-from mapbox import Geocoder
 from geopy.geocoders import MapBox
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
@@ -102,7 +98,7 @@ def geocode_address(address_str, access_token):
     if location is None:
         return None
 
-    return Point(location.longitude, location.latitude)
+    return (location.longitude, location.latitude)
 
 @api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
@@ -119,7 +115,6 @@ def get_restaurants_by_location(request):
         return Response("Customer not found. Please log in as a customer", status=404)
     
     mapbox_api_key = os.environ.get('MAPBOX_API_KEY')
-    user_location = Point(float(latitude), float(longitude))
 
     restaurants = []
     for restaurant in Restaurant.objects.all():
@@ -127,8 +122,8 @@ def get_restaurants_by_location(request):
         coordinates = geocode_address(address, mapbox_api_key)
         if coordinates is None:
             continue
-        restaurant_location = Point(coordinates['longitude'], coordinates['latitude'])
-        distance = user_location.distance(restaurant_location).miles
+        print(coordinates)
+        distance = 6
         if distance <= 5:
             restaurant.distance = distance
             restaurants.append(restaurant)

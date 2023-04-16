@@ -1,0 +1,1 @@
+https://github.com/GeoDjango/django-geospatial.git@master#egg=django-contrib-gis
