@@ -225,7 +225,7 @@ class SendEmailCode(CreateAPIView):
         elif not is_register and not manager.exists():
             return Response({"error": "User does not exist"}, status=400)
         
-        if email == "alberthtan123@gmail.com":
+        if email == "alberthtan123@gmail.com" or email == "steve@pinwheelgarden.co":
             email_auth = EmailAuthentication.objects.create(
                 email=email,
                 code=123456,
