@@ -234,6 +234,12 @@ class SendEmailCode(CreateAPIView):
             email_auth = EmailAuthentication.objects.create(
                 email=email,
             )
+
+            while email_auth.code == manager.employee_code:
+                EmailAuthentication.objects.filter(email=email).delete()
+                email_auth = EmailAuthentication.objects.create(
+                    email=email,
+                )
         
         try:
             send_mail(
@@ -355,14 +361,7 @@ class LoginVerifyEmailCode(UpdateAPIView):
         
         if not email_auths.exists():
             employee_code = str(manager.employee_code)
-            print(employee_code)
-            print(code)
-            print(type(employee_code))
-            print(type(code))
-            print(code == employee_code)
-            print(code == employee_code and employee_code != '0')
             if code == employee_code and employee_code != '0':
-                print("here")
                 email_auths.update(is_verified=True)
                 EmailAuthentication.objects.filter(email=email).delete()
                 manager_serializer = ManagerSerializer(manager)
