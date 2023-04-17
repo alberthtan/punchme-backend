@@ -426,6 +426,21 @@ def send_point(request):
             friend_points = CustomerPoints(customer=friend, restaurant=restaurant, num_points=1, timestamp=timezone.now())
             friend_points.save()
         finally:
+            customer_dict = {
+                "first_name": friend.first_name,
+                "last_name": friend.last_name,
+                "id": friend.id,
+            }
+
+            transaction = Transaction(
+                restaurant=restaurant, 
+                customer_string=json.dumps(customer_dict),
+                transaction_type="gift",
+                transaction_reward=customer.name,
+                num_points=1,
+            )
+            transaction.save()
+
             customer_points.give_point_eligible = False
             customer_points.save()
     else:
@@ -625,6 +640,22 @@ def use_referral(request):
     customer_points.save()
     
     referral.delete()
+
+    customer_dict = {
+        "first_name": customer.first_name,
+        "last_name": customer.last_name,
+        "id": customer.id,
+    }
+
+    transaction = Transaction(
+        restaurant=restaurant, 
+        customer_string=json.dumps(customer_dict),
+        transaction_type="gift",
+        transaction_reward=friend.name,
+        num_points=1,
+    )
+    transaction.save()
+
     return Response({"message": "Referral used successfully.",
                         "first_name": friend.first_name,
                         "last_name": friend.last_name,
