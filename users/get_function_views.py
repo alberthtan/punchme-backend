@@ -149,7 +149,6 @@ def get_restaurants_by_location(request):
         print(restaurant.name)
         print(coordinates)
         print(distance)
-        distance = 6
         if distance <= 5:
             restaurant.distance = distance
             restaurants.append(restaurant)
