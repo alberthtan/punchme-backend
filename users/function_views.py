@@ -435,7 +435,7 @@ def send_point(request):
             transaction = Transaction(
                 restaurant=restaurant, 
                 customer_string=json.dumps(customer_dict),
-                transaction_type="gift",
+                transaction_type="point",
                 transaction_reward=customer.name,
                 num_points=1,
             )
@@ -650,7 +650,7 @@ def use_referral(request):
     transaction = Transaction(
         restaurant=restaurant, 
         customer_string=json.dumps(customer_dict),
-        transaction_type="gift",
+        transaction_type="point",
         transaction_reward=friend.name,
         num_points=1,
     )
