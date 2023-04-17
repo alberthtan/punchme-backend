@@ -129,9 +129,6 @@ def get_restaurants_by_location(request):
     latitude = request.data.get('latitude')
     longitude = request.data.get('longitude')
 
-    print(latitude)
-    print(longitude)
-
     if not latitude or not longitude:
         return Response('Missing information', status=400)
     
@@ -149,9 +146,6 @@ def get_restaurants_by_location(request):
         if coordinates is None:
             continue
         distance = distance_in_miles(latitude, longitude, coordinates[0], coordinates[1])
-        print(restaurant.name)
-        print(coordinates)
-        print(distance)
         if distance <= 5:
             restaurant.distance = distance
             restaurants.append(restaurant)
