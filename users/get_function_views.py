@@ -129,6 +129,9 @@ def get_restaurants_by_location(request):
     latitude = request.data.get('latitude')
     longitude = request.data.get('longitude')
 
+    print(latitude)
+    print(longitude)
+
     if not latitude or not longitude:
         return Response('Missing information', status=400)
     
