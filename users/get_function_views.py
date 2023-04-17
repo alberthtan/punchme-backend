@@ -99,7 +99,7 @@ def geocode_address(address_str, access_token):
     if location is None:
         return None
 
-    return (location.longitude, location.latitude)
+    return (location.latitude, location.longitude)
 
 def distance_in_miles(lat1: int, lon1: int, lat2: int, lon2: int) -> float:
     """
