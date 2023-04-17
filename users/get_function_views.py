@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from geopy.geocoders import MapBox
+from math import radians, sin, cos, sqrt, atan2
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
 from users.views import CustomerPointsSerializer, ItemSerializer, RestaurantSerializer, CustomerSerializer, PushTokenSerializer, TransactionSerializer
@@ -100,6 +101,28 @@ def geocode_address(address_str, access_token):
 
     return (location.longitude, location.latitude)
 
+def distance_in_miles(lat1: int, lon1: int, lat2: int, lon2: int) -> float:
+    """
+    Calculate the distance between two points in miles given their latitude and longitude.
+    """
+    # Earth's radius in miles
+    R = 3958.8
+
+    # Convert latitudes and longitudes to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Calculate differences in latitude and longitude
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    # Apply Haversine formula
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+
+    return distance
+
+
 @api_view(['POST'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
 def get_restaurants_by_location(request):
@@ -122,7 +145,10 @@ def get_restaurants_by_location(request):
         coordinates = geocode_address(address, mapbox_api_key)
         if coordinates is None:
             continue
+        distance = distance_in_miles(latitude, longitude, coordinates[0], coordinates[1])
+        print(restaurant.name)
         print(coordinates)
+        print(distance)
         distance = 6
         if distance <= 5:
             restaurant.distance = distance
