@@ -219,6 +219,7 @@ class SendEmailCode(CreateAPIView):
             return Response("Missing information", status=400)
         
         manager = Manager.objects.filter(username=email)
+        print(manager)
 
         if is_register and manager.exists():
             return Response({"error": "User already exists"}, status=400)
