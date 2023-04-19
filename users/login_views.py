@@ -303,7 +303,6 @@ class RegisterVerifyEmailCode(UpdateAPIView):
         # REGISTRATION
         first_name = verify_request.data.get("first_name")
         last_name = verify_request.data.get("last_name")
-        email = verify_request.data.get("email")
 
         try:
             user = Manager.objects.create_user(
