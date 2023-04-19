@@ -211,6 +211,7 @@ class SendEmailCode(CreateAPIView):
         code_request.is_valid(raise_exception=True)
 
         email = code_request.data.get('email')
+        email = email.lower().replace(" ", "")
         is_register = code_request.data.get('is_register')
         
         EmailAuthentication.objects.filter(email=email).delete()
@@ -280,6 +281,7 @@ class RegisterVerifyEmailCode(UpdateAPIView):
         verify_request.is_valid(raise_exception=True)
 
         email = verify_request.data.get('email')
+        email = email.lower().replace(" ", "")
         code = verify_request.data.get('code')
         
         email_auths = EmailAuthentication.objects.filter(
@@ -351,6 +353,7 @@ class LoginVerifyEmailCode(UpdateAPIView):
         verify_request.is_valid(raise_exception=True)
 
         email = verify_request.data.get('email')
+        email = email.lower().replace(" ", "")
         code = verify_request.data.get('code')
 
         manager = get_object_or_404(Manager, username=email)

@@ -507,7 +507,7 @@ def validate_redemption(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticatedAndActive])
-def generate_ws_access_token(request):
+def generate_ws_access_TokenR(request):
     id = request.data.get("id")
     role = request.data.get("role")
 
