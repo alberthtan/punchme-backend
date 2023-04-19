@@ -237,13 +237,7 @@ def get_push_tokens(request, phone_number):
 
 @api_view(['POST'])
 def dummy(request):
-    path = request.data.get("path")
-    initial = request.data.get("initial_url")
-    query = request.data.get("query_params")
-    print("initial url")
-    print(initial)
-    print("path")
-    print(path)
-    print("query params")
-    print(query)
+    data = request.data.get("data")
+    print("data")
+    print(data)
     return Response(status=200)
