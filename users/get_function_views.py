@@ -235,7 +235,7 @@ def get_push_tokens(request, phone_number):
     
     return Response(data, status=200)
 
-@api_view(['POST'])
+@api_view(['PATCH'])
 def dummy(request):
     data = request.data.get("data")
     print("data")
