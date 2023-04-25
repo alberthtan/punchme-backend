@@ -130,10 +130,10 @@ def get_restaurants_by_location(request):
     restaurants = []
     for restaurant in Restaurant.objects.all():
         restaurant_latitude = restaurant.latitude
-        restaruant_longitude = restaurant.longitude
-        if latitude is None or longitude is None:
+        restaurant_longitude = restaurant.longitude
+        if restaurant_latitude is None or restaurant_longitude is None:
             continue
-        distance = distance_in_miles(latitude, longitude, restaurant_latitude, restaruant_longitude)
+        distance = distance_in_miles(latitude, longitude, restaurant_latitude, restaurant_longitude)
         if distance <= 5:
             restaurant.distance = distance
             restaurants.append(restaurant)
