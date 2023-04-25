@@ -3,7 +3,6 @@ import json, os
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
-from geopy.geocoders import MapBox
 from math import radians, sin, cos, sqrt, atan2
 
 from users.models import Customer, Manager, CustomerPoints, Item, Restaurant, Friendship, PushToken, Transaction
@@ -92,15 +91,6 @@ def get_all_restaurants(request):
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
 
-def geocode_address(address_str, access_token=os.environ.get('MAPBOX_API_KEY')):
-    geolocator = MapBox(api_key=access_token)
-    location = geolocator.geocode(address_str)
-
-    if location is None:
-        return None
-
-    return (location.latitude, location.longitude)
-
 def distance_in_miles(lat1: int, lon1: int, lat2: int, lon2: int) -> float:
     """
     Calculate the distance between two points in miles given their latitude and longitude.
@@ -136,16 +126,14 @@ def get_restaurants_by_location(request):
         customer = Customer.objects.get(username=request.user.username)
     except Customer.DoesNotExist:
         return Response("Customer not found. Please log in as a customer", status=404)
-    
-    mapbox_api_key = os.environ.get('MAPBOX_API_KEY')
 
     restaurants = []
     for restaurant in Restaurant.objects.all():
-        address = restaurant.address
-        coordinates = geocode_address(address, mapbox_api_key)
-        if coordinates is None:
+        restaurant_latitude = restaurant.latitude
+        restaruant_longitude = restaurant.longitude
+        if latitude is None or longitude is None:
             continue
-        distance = distance_in_miles(latitude, longitude, coordinates[0], coordinates[1])
+        distance = distance_in_miles(latitude, longitude, restaurant_latitude, restaruant_longitude)
         if distance <= 5:
             restaurant.distance = distance
             restaurants.append(restaurant)
