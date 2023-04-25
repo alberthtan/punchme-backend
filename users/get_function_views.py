@@ -92,7 +92,7 @@ def get_all_restaurants(request):
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
 
-def geocode_address(address_str, access_token):
+def geocode_address(address_str, access_token=os.environ.get('MAPBOX_API_KEY')):
     geolocator = MapBox(api_key=access_token)
     location = geolocator.geocode(address_str)
 

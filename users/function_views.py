@@ -11,6 +11,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.core.mail import send_mail
 
+from geopy.geocoders import MapBox
+
 from users.models import Customer, Manager, Item, ItemRedemption, RestaurantQR, CustomerPoints
 from users.models import Friendship, Restaurant, Referral, PushToken, Transaction, restaurant_signal
 from users.views import CustomerSerializer, ManagerSerializer, ItemSerializer, RestaurantSerializer
@@ -24,6 +26,15 @@ from twilio.base.exceptions import TwilioException
 @receiver(restaurant_signal)
 def restaurant_signal_receiver(sender, restaurant_id, **kwargs):
     generate_new_qr_code(sender)
+
+def geocode_address(address_str, access_token=os.environ.get('MAPBOX_API_KEY')):
+    geolocator = MapBox(api_key=access_token)
+    location = geolocator.geocode(address_str)
+
+    if location is None:
+        return None
+
+    return (location.latitude, location.longitude)
 
 @api_view(['GET'])
 @permission_classes([CustomerPermissions, IsAuthenticatedAndActive])
@@ -106,6 +117,13 @@ def update_manager(request):
     for attr, value in validated_data.items():
         if attr == "restaurant":
             for restaurant_attr, restaurant_value in value.items():
+                if restaurant_attr == 'address':
+                    location = geocode_address(restaurant_value)
+                    if location:
+                        manager.restaurant.latitude, manager.restaurant.longitude = location
+                    else:
+                        manager.restaurant.latitude = None
+                        manager.restaurant.longitude = None
                 setattr(manager.restaurant, restaurant_attr, restaurant_value)
             # Save the updated restaurant object
             manager.restaurant.save()
@@ -169,8 +187,14 @@ def update_restaurant(request):
 
     # Update the customer instance with the validated data
     for attr, value in validated_data.items():
-        print(attr)
-        print(value)
+        if attr == 'address':
+            # Geocode the new address to get latitude and longitude
+            location = geocode_address(value)
+            if location:
+                restaurant.latitude, restaurant.longitude = location
+            else:
+                restaurant.latitude = None
+                restaurant.longitude = None
         setattr(restaurant, attr, value)
 
     # Save the customer instance

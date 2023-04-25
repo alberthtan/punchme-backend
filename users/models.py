@@ -89,6 +89,8 @@ class Restaurant(models.Model):
     address = models.CharField(max_length=255, blank=True)
     manager = models.OneToOneField(Manager, on_delete=models.CASCADE, related_name='restaurant')
     restaurant_image = models.FileField(upload_to='restaurants/', blank=True, null=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         try:
