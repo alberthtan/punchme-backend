@@ -187,6 +187,8 @@ def update_restaurant(request):
 
     # Update the customer instance with the validated data
     for attr, value in validated_data.items():
+        print(attr)
+        print(value)
         if attr == 'address':
             # Geocode the new address to get latitude and longitude
             location = geocode_address(value)
