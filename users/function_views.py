@@ -193,6 +193,7 @@ def update_restaurant(request):
     for attr, value in validated_data.items():
         print(attr)
         print(value)
+        print(type(value))
         if attr == 'address':
             # Geocode the new address to get latitude and longitude
             location = geocode_address(value)
