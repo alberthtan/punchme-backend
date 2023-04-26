@@ -186,14 +186,9 @@ def update_restaurant(request):
 
     # Extract the validated data from the serializer
     validated_data = serializer.validated_data
-    print("DATA")
-    print(validated_data)
 
     # Update the customer instance with the validated data
     for attr, value in validated_data.items():
-        print(attr)
-        print(value)
-        print(type(value))
         if attr == 'address':
             # Geocode the new address to get latitude and longitude
             location = geocode_address(value)
@@ -202,16 +197,10 @@ def update_restaurant(request):
             else:
                 restaurant.latitude = None
                 restaurant.longitude = None
-            print("Latitude:", restaurant.latitude)
-            print("Longitude:", restaurant.longitude)
             restaurant.address = value
             print(restaurant.address)
         else:
             setattr(restaurant, attr, value)
-
-    print("HERE")
-    print(restaurant)
-    print(restaurant.address)
 
     # Save the customer instance
     restaurant.save()

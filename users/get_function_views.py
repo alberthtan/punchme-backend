@@ -85,8 +85,8 @@ def get_all_restaurants(request):
     
     restaurants = Restaurant.objects.all()
 
-    customer_points = CustomerPoints.objects.filter(customer=customer)
-    restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
+    # customer_points = CustomerPoints.objects.filter(customer=customer)
+    # restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
             
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
@@ -129,17 +129,17 @@ def get_restaurants_by_location(request):
 
     restaurants = []
     for restaurant in Restaurant.objects.all():
-        restaurant_latitude = restaurant.latitude
-        restaurant_longitude = restaurant.longitude
-        if restaurant_latitude is None or restaurant_longitude is None:
-            continue
-        distance = distance_in_miles(latitude, longitude, restaurant_latitude, restaurant_longitude)
-        if distance <= 5:
-            restaurant.distance = distance
-            restaurants.append(restaurant)
+        # restaurant_latitude = restaurant.latitude
+        # restaurant_longitude = restaurant.longitude
+        # if restaurant_latitude is None or restaurant_longitude is None:
+        #     continue
+        # distance = distance_in_miles(latitude, longitude, restaurant_latitude, restaurant_longitude)
+        # if distance <= 5:
+        #     restaurant.distance = distance
+        restaurants.append(restaurant)
 
-    customer_points = CustomerPoints.objects.filter(customer=customer)
-    restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
+    # customer_points = CustomerPoints.objects.filter(customer=customer)
+    # restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
             
     serializer = RestaurantSerializer(restaurants, many=True)
     return Response(serializer.data, status=200)
