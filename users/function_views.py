@@ -184,6 +184,8 @@ def update_restaurant(request):
 
     # Extract the validated data from the serializer
     validated_data = serializer.validated_data
+    print("DATA")
+    print(validated_data)
 
     # Update the customer instance with the validated data
     for attr, value in validated_data.items():
@@ -198,6 +200,8 @@ def update_restaurant(request):
                 restaurant.latitude = None
                 restaurant.longitude = None
         setattr(restaurant, attr, value)
+
+    print("HERE")
     print(restaurant)
     print(restaurant.address)
 
