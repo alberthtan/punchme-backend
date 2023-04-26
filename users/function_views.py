@@ -202,6 +202,8 @@ def update_restaurant(request):
             else:
                 restaurant.latitude = None
                 restaurant.longitude = None
+            print("Latitude:", restaurant.latitude)
+            print("Longitude:", restaurant.longitude)
         setattr(restaurant, attr, value)
 
     print("HERE")
