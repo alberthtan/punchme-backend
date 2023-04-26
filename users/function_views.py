@@ -173,6 +173,8 @@ def update_restaurant(request):
     except Manager.DoesNotExist:
         return Response("Manager not found. Please log in as a manager.", status=404)
     
+    print(request.data)
+
     try:
         restaurant = Restaurant.objects.get(id=manager.restaurant.id)
     except Restaurant.DoesNotExist:
