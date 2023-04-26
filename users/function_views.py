@@ -196,6 +196,7 @@ def update_restaurant(request):
                 restaurant.latitude = None
                 restaurant.longitude = None
         setattr(restaurant, attr, value)
+    print(restaurant)
 
     # Save the customer instance
     restaurant.save()
