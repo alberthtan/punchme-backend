@@ -120,6 +120,9 @@ class RegisterVerifyPhoneCode(UpdateAPIView):
             user = Customer.objects.create_user(
                 username=phone_number, 
                 phone_number=phone_number,
+                first_name="",
+                last_name="",
+                email="",
             )
         except IntegrityError:
             return Response(
