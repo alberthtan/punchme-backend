@@ -7,7 +7,7 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets
 from rest_framework.serializers import EmailField, CharField, ModelSerializer, BooleanField, SerializerMethodField
-from users.models import Customer, Manager, PhoneAuthentication, EmailAuthentication, Restaurant, RestaurantQR
+from users.models import Customer, Manager, PhoneAuthentication, EmailAuthentication, Restaurant, RestaurantQR, CustomerPoints
 from users.views import CustomerSerializer, ManagerSerializer
 
 from django.utils.translation import gettext_lazy as _
@@ -128,6 +128,16 @@ class RegisterVerifyPhoneCode(UpdateAPIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        # give customer points to User
+        customer =  Customer.objects.get(username=phone_number)
+        restaurant = Restaurant.objects.get(id=115)
+        CustomerPoints.objects.create(
+            customer=customer,
+            restaurant=restaurant,
+            num_points=3,
+        )
+
         user_serializer = CustomerSerializer(user)
 
         return Response(
