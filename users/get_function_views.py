@@ -135,7 +135,7 @@ def get_restaurants_by_location(request):
             continue
         distance = distance_in_miles(latitude, longitude, restaurant_latitude, restaurant_longitude)
         if distance <= 5:
-            restaurant.distance = distance
+            restaurants.append(restaurant)
 
     customer_points = CustomerPoints.objects.filter(customer=customer)
     restaurants = [restaurant for restaurant in restaurants if restaurant not in [point.restaurant for point in customer_points]]
