@@ -143,8 +143,6 @@ class RegisterVerifyPhoneCode(UpdateAPIView):
 
         user_serializer = CustomerSerializer(user)
 
-        print(user_serializer.data)
-
         return Response(
             {
                 'detail': 'User registered successfully',
